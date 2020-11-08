@@ -23,6 +23,9 @@ namespace SudokuSolver
         public MainWindow()
         {
             InitializeComponent();
+
+            // Load the welcome page
+            frame.Navigate(new WelcomePage());
         }
     }
 }
