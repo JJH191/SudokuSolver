@@ -22,26 +22,57 @@ namespace SudokuSolver
     /// </summary>
     public partial class ImageAdjustmentsPage : Page
     {
-        private readonly SudokuImageViewModel viewModel;
+        private readonly ImageAdjustmentViewModel viewModel;
 
-        private Ellipse[] corners = new Ellipse[4];
+        private readonly Path quad;
+        private readonly Ellipse[] corners = new Ellipse[4];
         private int selected = -1;
 
         public ImageAdjustmentsPage(string sudokuPath)
         {
             InitializeComponent();
-            viewModel = ((SudokuImageViewModel)DataContext);
+            viewModel = ((ImageAdjustmentViewModel)DataContext);
 
             viewModel.BitmapImage = new BitmapImage(new Uri(sudokuPath));
             viewModel.Threshold = 0.5;
 
+
+            // Adds corners clockwise
+            for (int j = 0; j < 2; j++)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    int index = j * 2 + i;
+                    corners[index] = new Ellipse { Width = 15, Height = 15, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 0, 0)) };
+                    corners[index].SetBinding(Canvas.LeftProperty, new Binding() { Source = viewModel.Corners[i].X });
+                    canvas.Children.Add(corners[index]);
+
+                    Canvas.SetLeft(corners[index], (j ^ i) == 0 ? 100 : canvas.Width - 100);
+                    Canvas.SetTop(corners[index], j == 0 ? 100 : canvas.Height - 100);
+                }
+            }
+
+            quad = new Path { Fill = new SolidColorBrush(Colors.Wheat), Stroke = new SolidColorBrush(Colors.Fuchsia), Visibility=Visibility.Visible};
+            canvas.Children.Add(quad);
+            UpdateQuad();
+        }
+
+        private void UpdateQuad()
+        {
+            PathGeometry pathGeometry = new PathGeometry();
+
             for (int i = 0; i < corners.Length; i++)
             {
-                corners[i] = new Ellipse { Width=15, Height=15, Fill=new SolidColorBrush(Colors.Green) };
-                canvas.Children.Add(corners[i]);
-                Canvas.SetTop(corners[i], i % 2 == 0 ? 100 : canvas.Height - 100);
-                Canvas.SetLeft(corners[i], i / 2 == 0 ? 100 : canvas.Width - 100);
+                double circleRadius = corners[i].Width / 2;
+                double x1 = Canvas.GetLeft(corners[i]) + circleRadius;
+                double y1 = Canvas.GetTop(corners[i]) + circleRadius;
+
+                double x2 = Canvas.GetLeft(corners[(i + 1) % corners.Length]) + circleRadius;
+                double y2 = Canvas.GetTop(corners[(i + 1) % corners.Length]) + circleRadius;
+                pathGeometry.AddGeometry(new LineGeometry(new Point(x1, y1), new Point(x2, y2)));
             }
+
+            quad.Data = pathGeometry;
         }
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -54,11 +85,11 @@ namespace SudokuSolver
             if (selected == -1) return;
             Point mousePos = e.GetPosition(canvas);
 
-            Canvas.SetLeft(corners[selected], Math.Max(Math.Min(mousePos.X, canvas.Width), 0) - corners[selected].Width / 2);
+            //Canvas.SetLeft(corners[selected], Math.Max(Math.Min(mousePos.X, canvas.Width), 0) - corners[selected].Width / 2);
+            viewModel.Corners[selected].X = (int)(Math.Max(Math.Min(mousePos.X, canvas.Width), 0) - corners[selected].Width / 2);
             Canvas.SetTop(corners[selected], Math.Max(Math.Min(mousePos.Y, canvas.Height), 0) - corners[selected].Height / 2);
-            
 
-            Debug.WriteLine(mousePos);
+            UpdateQuad();
         }
 
         private void canvas_MouseDown(object sender, MouseButtonEventArgs e)

@@ -11,7 +11,7 @@ namespace Models
 {
     public class SudokuImageModel
     {
-        private static readonly int imageDisplaySize = 600;
+        private static readonly int imageDisplaySize = 800;
 
         private Bitmap original;
         private Bitmap current;
@@ -55,7 +55,7 @@ namespace Models
         private Bitmap ResizeImage(Bitmap image, float _width)
         {
             int width = (int)_width;
-            int height = (int)((_width / image.Width) * image.Height);
+            int height = (int)(_width / image.Width * image.Height);
 
             var destRect = new Rectangle(0, 0, width, height);
             var destImage = new Bitmap(width, height);

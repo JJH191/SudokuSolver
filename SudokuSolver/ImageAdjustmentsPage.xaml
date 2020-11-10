@@ -8,15 +8,14 @@
       mc:Ignorable="d" 
       Title="ImageAdjustmentsPage">
     <Page.DataContext>
-        <viewmodels:SudokuImageViewModel/>
+        <viewmodels:ImageAdjustmentViewModel/>
     </Page.DataContext>
 
     <StackPanel>
         <Canvas x:Name="canvas" 
-                Width="{Binding BitmapImage.Width, Mode=OneWay}" Height="{Binding BitmapImage.Height, Mode=OneWay}" 
+                Width="{Binding BitmapImage.Width, Mode=OneWay}" Height="{Binding BitmapImage.Height, Mode=OneWay}"
                 MouseMove="canvas_MouseMoved" MouseDown="canvas_MouseDown" MouseUp="canvas_MouseUp">
             <Image x:Name="image" Source="{Binding BitmapImage}"/>
-            <Path x:Name="quad" Fill="#A0FFFFFF"/>
         </Canvas>
         <Slider x:Name="slider" Width="400" Maximum="1" ValueChanged="Slider_ValueChanged" Margin="0,10,0,0" Value="{Binding Threshold}" LargeChange="0.1"/>
     </StackPanel>
