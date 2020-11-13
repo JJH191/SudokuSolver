@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Models
 {
@@ -52,10 +47,9 @@ namespace Models
         }
 
         // Not my code
-        private Bitmap ResizeImage(Bitmap image, float _width)
+        private Bitmap ResizeImage(Bitmap image, int width)
         {
-            int width = (int)_width;
-            int height = (int)(_width / image.Width * image.Height);
+            int height = (int)((float)width / image.Width * image.Height);
 
             var destRect = new Rectangle(0, 0, width, height);
             var destImage = new Bitmap(width, height);

@@ -4,20 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using ViewModels;
 
 namespace Models
 {
     public class QuadModel
     {
-        private readonly Point[] points = new Point[4];
-
-        public Point this[int index]
+        public QuadModel(PointPos[] points)
         {
-            get => points[index];
-            set => points[index] = value;
+            Points = points;
         }
 
-        public Point[] Points { get => points; }
-        public int Length { get => points.Length; }
+        public PointPos this[int index]
+        {
+            get => Points[index];
+            set => Points[index] = value;
+        }
+
+        public PointPos[] Points { get; } = new PointPos[4];
+        public int Length { get => Points.Length; }
     }
 }
