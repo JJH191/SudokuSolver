@@ -1,5 +1,6 @@
 ﻿using Models;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -38,6 +39,15 @@ namespace ViewModels
         {
             sudokuImage.Grayscale();
             Notify(nameof(BitmapImage));
+        }
+
+        public Bitmap GetAdjustedImage(QuadViewModel quad, double ActualWidth)
+        {
+            // Due to DPI scaling, the width on the canvas is not always the same as the actual width of the image, so I scale the image to account for this so the quad ends up in the right spot
+            double scaleFactor = sudokuImage.Image.Width / ActualWidth;
+            PointPos[] clockwisePoints = quad.GetModel().GetClockwisePoints().Select(point => point * scaleFactor).ToArray();
+
+            return sudokuImage.GetAdjustedImage(clockwisePoints);
         }
 
         // Not my code

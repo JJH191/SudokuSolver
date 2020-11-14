@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ViewModels;
 
@@ -26,7 +21,6 @@ namespace SudokuSolver
         private readonly QuadViewModel quadViewModel = new QuadViewModel();
 
         private readonly double circleRadius = 7.5f;
-        private readonly Ellipse[] corners = new Ellipse[4];
         private int selected = -1;
 
         public ImageAdjustmentsPage(string sudokuPath)
@@ -38,12 +32,13 @@ namespace SudokuSolver
             viewModel.Threshold = 0.5;
 
             // Adds corners clockwise
+            Ellipse[] corners = new Ellipse[4];
             for (int j = 0; j < 2; j++)
             {
                 for (int i = 0; i < 2; i++)
                 {
                     int index = j * 2 + i;
-                    corners[index] = new Ellipse { Width = circleRadius * 2, Height = circleRadius * 2, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 0, 0)) };
+                    corners[index] = new Ellipse { Width = circleRadius * 2, Height = circleRadius * 2, Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(100, 255, 100, 200)) };
                     canvas.Children.Add(corners[index]);
                 }
             }
@@ -66,7 +61,7 @@ namespace SudokuSolver
         /// </summary>
         private void CreateQuad()
         {
-            for (int i = 0; i < corners.Length; i++)
+            for (int i = 0; i < quadViewModel.Length; i++)
             {
                 Line line = new Line
                 {
@@ -76,8 +71,8 @@ namespace SudokuSolver
                 // Set all the bindings for each coordinate to the quad's corner positiopns
                 line.SetBinding(Line.X1Property, new Binding($"[{i}].X") { Source = quadViewModel, Mode = BindingMode.OneWay });
                 line.SetBinding(Line.Y1Property, new Binding($"[{i}].Y") { Source = quadViewModel, Mode = BindingMode.OneWay });
-                line.SetBinding(Line.X2Property, new Binding($"[{(i + 1) % corners.Length}].X") { Source = quadViewModel, Mode = BindingMode.OneWay });
-                line.SetBinding(Line.Y2Property, new Binding($"[{(i + 1) % corners.Length}].Y") { Source = quadViewModel, Mode = BindingMode.OneWay });
+                line.SetBinding(Line.X2Property, new Binding($"[{(i + 1) % quadViewModel.Length}].X") { Source = quadViewModel, Mode = BindingMode.OneWay });
+                line.SetBinding(Line.Y2Property, new Binding($"[{(i + 1) % quadViewModel.Length}].Y") { Source = quadViewModel, Mode = BindingMode.OneWay });
 
                 canvas.Children.Add(line);
             }
@@ -98,11 +93,11 @@ namespace SudokuSolver
         {
             // If there isn't a corner currently being dragged, return
             if (selected == -1) return;
-            Point mousePos = e.GetPosition(canvas);
+            System.Windows.Point mousePos = e.GetPosition(canvas);
 
-            quadViewModel[selected] = new System.Drawing.Point(
-                (int)Math.Max(Math.Min(mousePos.X, canvas.Width), 0),
-                (int)Math.Max(Math.Min(mousePos.Y, canvas.Height), 0)
+            quadViewModel[selected] = new PointPos(
+                Math.Max(Math.Min(mousePos.X, canvas.Width), 0),
+                Math.Max(Math.Min(mousePos.Y, canvas.Height), 0)
             );
         }
 
@@ -112,10 +107,10 @@ namespace SudokuSolver
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
             // Get the current mouse position
-            Point mousePos = e.GetPosition(canvas);
+            System.Windows.Point mousePos = e.GetPosition(canvas);
 
             // Loop through all the corners
-            for (int i = 0; i < corners.Length; i++)
+            for (int i = 0; i < quadViewModel.Length; i++)
             {
                 double distSquaredFromPoint = (new PointPos(mousePos) - quadViewModel[i]).LengthSquared();
 
@@ -136,6 +131,67 @@ namespace SudokuSolver
         {
             // Reset selected so the corner will not continue to stick to the mouse
             selected = -1;
+        }
+
+        /// <summary>
+        /// Go to the next page and pass the adjusted image
+        /// </summary>
+        private void Btn_Next(object sender, RoutedEventArgs e)
+        {
+            Bitmap adjustedImage = viewModel.GetAdjustedImage(quadViewModel, canvas.ActualWidth);
+            // TODO: Clean image
+            float cellSize = adjustedImage.Width / 9f;
+
+            int[,] sudoku = new int[9,9];
+
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    float x = cellSize * i;
+                    float y = cellSize * j;
+
+                    Bitmap cell = adjustedImage.Clone(new System.Drawing.Rectangle((int)x, (int)y, (int)cellSize, (int)cellSize), adjustedImage.PixelFormat);
+
+                    float emptyThreshold = 0.02f;
+                    if (GetAverageColor(cell).R < emptyThreshold * 255) sudoku[i, j] = -1;
+                    else sudoku[i, j] = 1; // TODO: use neural network to recognise digit
+                }
+            }
+
+            // TODO: Navigate to next page with sudoku grid
+        }
+
+        // NOT MY CODE
+        public static System.Drawing.Color GetAverageColor(Bitmap bmp)
+        {
+            //Used for tally
+            int r = 0;
+            int g = 0;
+            int b = 0;
+
+            int total = 0;
+
+            for (int x = 0; x < bmp.Width; x++)
+            {
+                for (int y = 0; y < bmp.Height; y++)
+                {
+                    System.Drawing.Color clr = bmp.GetPixel(x, y);
+
+                    r += clr.R;
+                    g += clr.G;
+                    b += clr.B;
+
+                    total++;
+                }
+            }
+
+            //Calculate average
+            r /= total;
+            g /= total;
+            b /= total;
+
+            return System.Drawing.Color.FromArgb(r, g, b);
         }
     }
 }

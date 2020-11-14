@@ -29,14 +29,21 @@ namespace SudokuSolver
         /// <summary>
         /// Prompt the user to select their sudoku image then navigate to the next page
         /// </summary>
-        private void BtnSelectSudokuImage(object sender, RoutedEventArgs e)
+        private void Btn_Solve(object sender, RoutedEventArgs e)
         {
             // Prompt the user to select the sudoku image
             OpenFileDialog fileDialog = new OpenFileDialog { Filter = "Image (*.png, *.jpg)|*.png;*.jpg" };
-            fileDialog.ShowDialog();
+
+            // If the user hasn't selected a file, return
+            if (fileDialog.ShowDialog() == false) return;
 
             // Navigate to image adjustments page and pass the image path
             NavigationService.Navigate(new ImageAdjustmentsPage(fileDialog.FileName));
+        }
+
+        private void Btn_Review(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

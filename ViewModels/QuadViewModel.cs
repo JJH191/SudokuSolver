@@ -24,7 +24,6 @@ namespace ViewModels
                 new PointPos(200, 200), 
                 new PointPos(200, 100), 
             });
-
         }
 
         public Point this[int index]
@@ -39,6 +38,9 @@ namespace ViewModels
                 Notify(Binding.IndexerName);
             }
         }
+        public int Length => 4;
+
+        public QuadModel GetModel() => quad;
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void Notify(string property)
