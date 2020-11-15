@@ -128,6 +128,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DigitClassifier\DigitClassifier.csproj">
+      <Project>{278b53b4-d3be-4894-99c9-e406c28b1df2}</Project>
+      <Name>DigitClassifier</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HelperClasses\HelperClasses.csproj">
       <Project>{8EBE359A-FC81-405A-939A-0424D45FF4A3}</Project>
       <Name>HelperClasses</Name>

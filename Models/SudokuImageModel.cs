@@ -51,7 +51,7 @@ namespace Models
             }
 
             // TODO: Try neural network with greyscale rather than pure black/white
-            current = AdjustContrast(current, (int)(Threshold * 100));
+            current = AdjustContrast(current, (int)(Threshold * 200));
         }
 
         // NOT MY CODE

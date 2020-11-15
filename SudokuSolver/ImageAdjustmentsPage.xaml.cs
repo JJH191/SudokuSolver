@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DigitClassifier;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows;
@@ -139,10 +141,11 @@ namespace SudokuSolver
         private void Btn_Next(object sender, RoutedEventArgs e)
         {
             Bitmap adjustedImage = viewModel.GetAdjustedImage(quadViewModel, canvas.ActualWidth);
-            // TODO: Clean image
+            adjustedImage = Invert(RemoveBorders(adjustedImage));
             float cellSize = adjustedImage.Width / 9f;
 
             int[,] sudoku = new int[9,9];
+            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("neural_network.nn");
 
             for (int j = 0; j < 9; j++)
             {
@@ -153,13 +156,69 @@ namespace SudokuSolver
 
                     Bitmap cell = adjustedImage.Clone(new System.Drawing.Rectangle((int)x, (int)y, (int)cellSize, (int)cellSize), adjustedImage.PixelFormat);
 
+                    //cell.Save($"{i},{j}.png");
+
                     float emptyThreshold = 0.02f;
+                    //Debug.WriteLine(GetAverageColor(cell).R);
                     if (GetAverageColor(cell).R < emptyThreshold * 255) sudoku[i, j] = -1;
-                    else sudoku[i, j] = 1; // TODO: use neural network to recognise digit
+                    else sudoku[i, j] = classifier.GetDigit(cell);
                 }
             }
 
             // TODO: Navigate to next page with sudoku grid
+        }
+        
+        // NOT MY CODE
+        private Bitmap Invert(Bitmap image)
+        {
+            Bitmap result = new Bitmap(image);
+            for (int y = 0; (y <= (result.Height - 1)); y++)
+            {
+                for (int x = 0; (x <= (result.Width - 1)); x++)
+                {
+                    System.Drawing.Color inv = result.GetPixel(x, y);
+                    inv = System.Drawing.Color.FromArgb(255, (255 - inv.R), (255 - inv.G), (255 - inv.B));
+                    result.SetPixel(x, y, inv);
+                }
+            }
+
+            return result;
+        }
+
+        private Bitmap RemoveBorders(Bitmap source)
+        {
+            Bitmap result = new Bitmap(source);
+            for (int i = 0; i < result.Width; i++) result = FloodFill(result, i, 0); // Top
+            for (int i = 0; i < result.Width; i++) result = FloodFill(result, i, result.Height - 1); // Bottom
+            for (int i = 0; i < result.Height; i++) result = FloodFill(result, 0, i); // Left
+            for (int i = 0; i < result.Height; i++) result = FloodFill(result, result.Width - 1, i); // Right
+
+            return result;
+        }
+
+        // NOT MY CODE!
+        private Bitmap FloodFill(Bitmap image, int x, int y)
+        {
+            Stack<PointPos> pixels = new Stack<PointPos>();
+            pixels.Push(new PointPos(x, y));
+
+            while (pixels.Count > 0)
+            {
+                PointPos a = pixels.Pop();
+                if (a.X < image.Width && a.X > -1 && a.Y < image.Height && a.Y > -1)
+                {
+                    System.Drawing.Color pixelCol = image.GetPixel((int)a.X, (int)a.Y);
+                    if (pixelCol.R + pixelCol.G + pixelCol.B != 255 * 3)
+                    {
+                        image.SetPixel((int)a.X, (int)a.Y, System.Drawing.Color.White);
+                        pixels.Push(new PointPos(a.X - 1, a.Y));
+                        pixels.Push(new PointPos(a.X + 1, a.Y));
+                        pixels.Push(new PointPos(a.X, a.Y - 1));
+                        pixels.Push(new PointPos(a.X, a.Y + 1));
+                    }
+                }
+            }
+            return image;
         }
 
         // NOT MY CODE

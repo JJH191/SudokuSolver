@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModels", "ViewModels\Vi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperClasses", "HelperClasses\HelperClasses.csproj", "{8EBE359A-FC81-405A-939A-0424D45FF4A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitClassifier", "DigitClassifier\DigitClassifier.csproj", "{278B53B4-D3BE-4894-99C9-E406C28B1DF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingInterface", "TrainingInterface\TrainingInterface.csproj", "{D5A34D72-9690-49B1-A632-61D5384ACEAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{8EBE359A-FC81-405A-939A-0424D45FF4A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8EBE359A-FC81-405A-939A-0424D45FF4A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8EBE359A-FC81-405A-939A-0424D45FF4A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{278B53B4-D3BE-4894-99C9-E406C28B1DF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{278B53B4-D3BE-4894-99C9-E406C28B1DF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{278B53B4-D3BE-4894-99C9-E406C28B1DF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{278B53B4-D3BE-4894-99C9-E406C28B1DF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5A34D72-9690-49B1-A632-61D5384ACEAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5A34D72-9690-49B1-A632-61D5384ACEAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5A34D72-9690-49B1-A632-61D5384ACEAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5A34D72-9690-49B1-A632-61D5384ACEAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
