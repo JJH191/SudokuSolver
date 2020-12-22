@@ -49,6 +49,7 @@
     <Compile Include="InputData.cs" />
     <Compile Include="MnistDataset.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="ProgressBar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

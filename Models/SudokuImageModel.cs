@@ -11,7 +11,7 @@ namespace Models
 {
     public class SudokuImageModel
     {
-        private static readonly int imageDisplaySize = 800;
+        private static readonly int imageDisplaySize = 500;
 
         private Bitmap original;
         private Bitmap current;

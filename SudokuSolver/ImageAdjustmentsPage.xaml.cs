@@ -161,7 +161,12 @@ namespace SudokuSolver
                     float emptyThreshold = 0.02f;
                     //Debug.WriteLine(GetAverageColor(cell).R);
                     if (GetAverageColor(cell).R < emptyThreshold * 255) sudoku[i, j] = -1;
-                    else sudoku[i, j] = classifier.GetDigit(cell);
+                    else
+                    {
+                        // Invert colours ?
+                        sudoku[i, j] = classifier.GetDigit(cell);
+                        Console.WriteLine(sudoku[i, j]);
+                    }
                 }
             }
 

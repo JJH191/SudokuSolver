@@ -9,8 +9,8 @@ namespace TrainingInterface
     {
         static void Main()
         {
-            TestNetwork(new NeuralNetworkDigitClassifier("trained_network.nn"));
-            //CreateAndTrainNetwork("trained_network.nn");
+            //TestNetwork(new NeuralNetworkDigitClassifier("trained_network.nn"));
+            CreateAndTrainNetwork("trained_network.nn");
             Console.ReadLine();
         }
 
@@ -38,7 +38,7 @@ namespace TrainingInterface
             NeuralNetwork network = networkBuilder.BuildNeuralNetwork();
 
             Console.WriteLine("Loading dataset");
-            IDataset mnist = new EmnistDataset("../res/");
+            IDataset mnist = new MnistDataset("../res/mnist_train.csv");
             mnist.Shuffle();
 
             Console.WriteLine("Training network");
@@ -47,13 +47,16 @@ namespace TrainingInterface
             //    network.Train(inputData.inputs, inputData.targets);
 
             InputData[] data = mnist.GetData();
+            ProgressBar progressBar = new ProgressBar(data.Length, 75);
             for (int i = 0; i < data.Length; i++)
             {
+
                 network.Train(data[i].inputs, data[i].targets);
-                if (i % 1000 == 0)
+                if (i % 1 == 0)
                 {
-                    Console.WriteLine($"{i}");
-                    Console.SetCursorPosition(0, Console.CursorTop - 1);
+                    progressBar.PrintProgress(i);
+                //    Console.WriteLine($"{i}");
+                //    Console.SetCursorPosition(0, Console.CursorTop - 1);
                 }
             }
             Console.WriteLine();
