@@ -49,7 +49,6 @@
     <Compile Include="InputData.cs" />
     <Compile Include="MnistDataset.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProgressBar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -59,6 +58,10 @@
     <ProjectReference Include="..\DigitClassifier\DigitClassifier.csproj">
       <Project>{278b53b4-d3be-4894-99c9-e406c28b1df2}</Project>
       <Name>DigitClassifier</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HelperClasses\HelperClasses.csproj">
+      <Project>{8ebe359a-fc81-405a-939a-0424d45ff4a3}</Project>
+      <Name>HelperClasses</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

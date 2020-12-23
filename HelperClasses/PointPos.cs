@@ -7,7 +7,7 @@ namespace ViewModels
     /// <summary>
     /// Simple wrapper that that supports simple maths and implicit conversion to System.Drawing.Point, System.Windows.Point and Accord.IntPoint
     /// </summary>
-    public class PointPos
+    public class PointPos : IEquatable<PointPos>
     {
         public double X { get; set; }
         public double Y { get; set; }
@@ -91,5 +91,10 @@ namespace ViewModels
         // NOT MY CODE
         public double CrossProduct(PointPos other) => X * other.Y - Y * other.X;
         #endregion
+
+        public bool Equals(PointPos other)
+        {
+            return (this.X == other.X && this.Y == other.Y);
+        }
     }
 }

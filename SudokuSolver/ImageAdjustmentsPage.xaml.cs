@@ -1,6 +1,6 @@
 ﻿using DigitClassifier;
+using HelperClasses;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows;
@@ -159,13 +159,11 @@ namespace SudokuSolver
                     //cell.Save($"{i},{j}.png");
 
                     float emptyThreshold = 0.02f;
-                    //Debug.WriteLine(GetAverageColor(cell).R);
                     if (GetAverageColor(cell).R < emptyThreshold * 255) sudoku[i, j] = -1;
                     else
                     {
-                        // Invert colours ?
                         sudoku[i, j] = classifier.GetDigit(cell);
-                        Console.WriteLine(sudoku[i, j]);
+                        Debug.WriteLine(sudoku[i, j]);
                     }
                 }
             }
@@ -190,43 +188,56 @@ namespace SudokuSolver
             return result;
         }
 
+        // Optimise (can reduce for loops and should not have to do for every edge pixel)
         private Bitmap RemoveBorders(Bitmap source)
         {
             Bitmap result = new Bitmap(source);
-            for (int i = 0; i < result.Width; i++) result = FloodFill(result, i, 0); // Top
-            for (int i = 0; i < result.Width; i++) result = FloodFill(result, i, result.Height - 1); // Bottom
-            for (int i = 0; i < result.Height; i++) result = FloodFill(result, 0, i); // Left
-            for (int i = 0; i < result.Height; i++) result = FloodFill(result, result.Width - 1, i); // Right
+            for (int i = 0; i < result.Width; i++) result = FloodFill(result, new PointPos(i, 0)); // Top
+            for (int i = 0; i < result.Width; i++) result = FloodFill(result, new PointPos(i, result.Height - 1)); // Bottom
+            for (int i = 0; i < result.Height; i++) result = FloodFill(result, new PointPos(0, i)); // Left
+            for (int i = 0; i < result.Height; i++) result = FloodFill(result, new PointPos(result.Width - 1, i)); // Right
 
             return result;
         }
 
-        // NOT MY CODE!
-        private Bitmap FloodFill(Bitmap image, int x, int y)
+        private Bitmap FloodFill(Bitmap image, PointPos startPixelPos)
         {
-            Stack<PointPos> pixels = new Stack<PointPos>();
-            pixels.Push(new PointPos(x, y));
+            Bitmap result = new Bitmap(image);
 
-            while (pixels.Count > 0)
+            Stack<PointPos> pixelsToFill = new Stack<PointPos>(20);
+            pixelsToFill.Push(startPixelPos);
+
+            while (pixelsToFill.Count > 0)
             {
-                PointPos a = pixels.Pop();
-                if (a.X < image.Width && a.X > -1 && a.Y < image.Height && a.Y > -1)
+                PointPos currentPixel = pixelsToFill.Pop();
+
+                int x = (int)currentPixel.X;
+                int y = (int)currentPixel.Y;
+                if (x < 0 || y < 0 || x >= result.Width || y >= result.Height) continue;
+
+                System.Drawing.Color pixelCol = result.GetPixel(x, y);
+                if (pixelCol.R + pixelCol.G + pixelCol.B != 255 * 3) // If colour is not white
                 {
-                    System.Drawing.Color pixelCol = image.GetPixel((int)a.X, (int)a.Y);
-                    if (pixelCol.R + pixelCol.G + pixelCol.B != 255 * 3)
-                    {
-                        image.SetPixel((int)a.X, (int)a.Y, System.Drawing.Color.White);
-                        pixels.Push(new PointPos(a.X - 1, a.Y));
-                        pixels.Push(new PointPos(a.X + 1, a.Y));
-                        pixels.Push(new PointPos(a.X, a.Y - 1));
-                        pixels.Push(new PointPos(a.X, a.Y + 1));
-                    }
+                    result.SetPixel(x, y, System.Drawing.Color.White);
+
+                    // Add neighbouring pixels to stack
+                    for (int i = x - 1; i <= x + 1; i++)
+                        for (int j = y - 1; j <= y + 1; j++)
+                            pixelsToFill.Push(new PointPos(i, j));
                 }
             }
-            return image;
+
+            return result;
         }
 
-        // NOT MY CODE
+        // Move to helper classes
+        // Finds pythagorean distance between colors (normalised between 0 and 1)
+        public static double ColorDifference(System.Drawing.Color col1, System.Drawing.Color col2)
+        {
+            return (Math.Pow(col1.R - col2.R, 2) + Math.Pow(col1.G - col2.G, 2) + Math.Pow(col1.B - col2.B, 2)) / (255 * 255);
+        }
+
+        // NOT MY CODE, move to helper classes
         public static System.Drawing.Color GetAverageColor(Bitmap bmp)
         {
             //Used for tally

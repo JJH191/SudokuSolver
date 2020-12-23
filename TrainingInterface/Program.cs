@@ -1,5 +1,6 @@
 ﻿using DigitClassifier;
 using DigitClassifier.Activation_Functions;
+using HelperClasses;
 using System;
 using System.Drawing;
 
@@ -10,7 +11,8 @@ namespace TrainingInterface
         static void Main()
         {
             //TestNetwork(new NeuralNetworkDigitClassifier("trained_network.nn"));
-            CreateAndTrainNetwork("trained_network.nn");
+            //CreateAndTrainNetwork("trained_network.nn");
+
             Console.ReadLine();
         }
 
