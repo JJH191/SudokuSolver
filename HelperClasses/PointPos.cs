@@ -1,8 +1,7 @@
 ﻿using Accord;
 using System;
-using System.Drawing;
 
-namespace ViewModels
+namespace HelperClasses
 {
     /// <summary>
     /// Simple wrapper that that supports simple maths and implicit conversion to System.Drawing.Point, System.Windows.Point and Accord.IntPoint

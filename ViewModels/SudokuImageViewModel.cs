@@ -1,13 +1,10 @@
-﻿using Models;
+﻿using HelperClasses;
+using Models;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace ViewModels
 {

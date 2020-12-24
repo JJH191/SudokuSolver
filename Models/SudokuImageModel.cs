@@ -1,11 +1,10 @@
 ﻿using Accord;
 using Accord.Imaging.Filters;
-using System;
+using HelperClasses;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
-using ViewModels;
 
 namespace Models
 {
