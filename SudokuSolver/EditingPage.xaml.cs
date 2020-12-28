@@ -91,5 +91,10 @@ namespace SudokuSolver
         {
             sudokuGrid.Clear();
         }
+
+        private void BtnBack(object sender, RoutedEventArgs e)
+        {
+            NavigationService.GoBack();
+        }
     }
 }

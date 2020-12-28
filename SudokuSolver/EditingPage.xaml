@@ -39,7 +39,15 @@
                 </Grid.RowDefinitions>
             </Grid>
         </Grid>
-        <Button Width="120" Height="20" Click="BtnSolveSudoku" Margin="0,20,0,0">Solve Sudoku</Button>
-        <Button Width="120" Height="20" Click="BtnClearSudoku" Margin="0,10,0,0">Clear Sudoku</Button>
+        <Grid Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Width="120" Height="20" Grid.Column="0" Click="BtnBack">Back</Button>
+            <Button Width="120" Height="20" Grid.Column="1"  Click="BtnSolveSudoku">Solve Sudoku</Button>
+            <Button Width="120" Height="20" Grid.Column="2"  Click="BtnClearSudoku">Clear Sudoku</Button>
+        </Grid>
     </StackPanel>
 </Page>

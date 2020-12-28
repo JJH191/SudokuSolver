@@ -82,18 +82,59 @@ namespace HelperClasses
         public static PointPos operator -(System.Windows.Point p1, PointPos p2) => new PointPos(p1.X - p2.X, p1.Y - p2.Y);
 
         public static PointPos operator *(PointPos p, double value) => new PointPos(p.X * value, p.Y * value);
+        public static PointPos operator *(PointPos p1, PointPos p2) => new PointPos(p1.X * p2.X, p1.Y * p2.Y);
 
         // Length calcuations using pythagoras
         public double LengthSquared() => X * X + Y * Y;
         public double Length() => Math.Sqrt(LengthSquared());
 
-        // NOT MY CODE
+        /// <summary>
+        /// Calculates the angle with the given options
+        /// By default, it measures the anticlockwise angle from the positive x-axis
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <param name="direction"></param>
+        /// <returns>The angle of the vector in radians</returns>
+        public double Angle(Axis axis = Axis.X, Direction direction = Direction.ANTICLOCKWISE)
+        {
+            double x = X;
+            double y = Y;
+
+            if (axis == Axis.NEG_X) x *= -1;
+            if (axis == Axis.NEG_Y) y *= -1;
+
+            double angle = Math.Atan2(y, x);
+            if (axis == Axis.Y || axis == Axis.NEG_Y) angle -= Math.PI / 2;
+            if (direction == Direction.CLOCKWISE) angle *= -1;
+
+            return NormaliseAngle(angle);
+        }
+
+        /// <summary>
+        /// Convert the angle to being between 0 and 2pi
+        /// </summary>
+        /// <param name="angle">Angle to normalise in radians</param>
+        /// <returns>The normalised angle</returns>
+        private double NormaliseAngle(double angle)
+        {
+            double twoPi = Math.PI * 2;
+
+            angle %= twoPi; // Make sure the magnitude of the angle is not greater than 2pi
+            angle += twoPi; // Make sure the angle is between 0 and 4pi
+            return angle % twoPi; // Make sure the angle is between 0 and 2pi
+        }
+
         public double CrossProduct(PointPos other) => X * other.Y - Y * other.X;
         #endregion
 
-        public bool Equals(PointPos other)
-        {
-            return (this.X == other.X && this.Y == other.Y);
-        }
+        /// <summary>
+        /// Value equality between this point and another
+        /// </summary>
+        /// <param name="other">The other point to check against</param>
+        /// <returns>True if the values are equal, false if not</returns>
+        public bool Equals(PointPos other) => X == other.X && Y == other.Y;
+
+        public enum Axis { X, Y, NEG_X, NEG_Y }
+        public enum Direction { CLOCKWISE, ANTICLOCKWISE }
     }
 }

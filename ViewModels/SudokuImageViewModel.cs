@@ -1,5 +1,6 @@
 ﻿using HelperClasses;
 using Models;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -46,7 +47,10 @@ namespace ViewModels
         {
             // Due to DPI scaling, the width on the canvas is not always the same as the actual width of the image, so I scale the image to account for this so the quad ends up in the right spot
             double scaleFactor = sudokuImage.Image.Width / ActualWidth;
-            PointPos[] clockwisePoints = quad.GetModel().GetClockwisePoints().Select(point => point * scaleFactor).ToArray();
+            PointPos[] clockwisePoints = quad.GetModel().GetClockwiseHull().Select(point => point * scaleFactor).ToArray();
+
+            // TODO: deal with invalid corner
+            if (clockwisePoints.Length != 4) throw new Exception("Invalid corners!");
 
             return sudokuImage.GetAdjustedImage(clockwisePoints);
         }

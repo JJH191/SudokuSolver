@@ -1,94 +1,127 @@
 ﻿using HelperClasses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Models
 {
+    /// <summary>
+    /// A model to keep track of the corners of the sudoku
+    /// </summary>
     public class QuadModel
     {
         private readonly PointPos[] points = new PointPos[4];
-        public int Length { get => points.Length; }
 
+        /// <summary>
+        /// Creates a new quad model with the points specified
+        /// </summary>
+        /// <param name="points">The corners of the quad to start with</param>
         public QuadModel(PointPos[] points)
         {
             this.points = points;
         }
 
+        /// <summary>
+        /// Get a specific point of the quad at the given <paramref name="index"/>
+        /// </summary>
+        /// <param name="index">The index of the point to get</param>
+        /// <returns></returns>
         public PointPos this[int index]
         {
-            get => points[index];
-            set => points[index] = value;
+            get => points[index]; // Get the point
+            set => points[index] = value; // Set the point
+        }
+
+        // TODO: optimise by using cross product instead of angle
+        /// <summary>
+        /// Gets the convex hull of the points in a clockwise order
+        /// NOTE: If one point is inside the others, it will not be included in the hull, so the hull will only contain 3 points
+        /// </summary>
+        /// <returns>The corners of the quad in clockwise order</returns>
+        public PointPos[] GetClockwiseHull()
+        {
+            // This algorithm works by starting with the top left point
+            // With this top left point, it will loop through all the other points and find the relative vector to them
+            // It will then calculate the angle between this relative vector and the y-axis
+            // The smallest angle will be the next point in the hull, going clockwise
+            // Once the top left point is reached again, the hull is complete
+
+            List<PointPos> cornersLeft = new List<PointPos>(points); // Keeps track of the corners left to add to the hull
+
+            // Get the top left point and start with that
+            PointPos topLeft = GetTopLeftPointOnHull(cornersLeft);
+            PointPos current = topLeft; 
+            //cornersLeft.Remove(current);
+
+            // The hull of the quad's points in a clockwise order, starting with the top left
+            List<PointPos> clockwiseHull = new List<PointPos> { current };
+
+            // Loop until no corners left to add
+            while (cornersLeft.Count > 0)
+            {
+                // Set the smallest angle to the angle between the top left and first corner in cornersLeft
+                PointPos smallestAnglePos = cornersLeft[0];
+
+                // Get the angle, clockwise, from negative y-axis (negative y is used here because angle expects up to be positive, but images take down as positive)
+                double smallestAngle = (smallestAnglePos - current).Angle(axis: PointPos.Axis.NEG_Y, direction: PointPos.Direction.CLOCKWISE); 
+
+                // Loop through the remaining corners and find the one with the smallest angle between it and the current corner
+                foreach (PointPos corner in cornersLeft)
+                {
+                    double angle = (corner - current).Angle(axis: PointPos.Axis.NEG_Y, direction: PointPos.Direction.CLOCKWISE);
+                    if (angle < smallestAngle)
+                    {
+                        smallestAngle = angle;
+                        smallestAnglePos = corner;
+                    }
+                }
+
+                // If we have reached the start again, the hull is complete, so exit
+                if (smallestAnglePos == topLeft) break;
+
+                clockwiseHull.Add(smallestAnglePos); // Add the new point to the hull
+                cornersLeft.Remove(smallestAnglePos); // Remove the point from cornersLeft so it isn't checked again
+                current = smallestAnglePos; // Change the current point to continue the hull from there
+            }
+
+            return clockwiseHull.ToArray();
         }
 
         /// <summary>
-        /// Checks if a corner of the quad is valid (it is invalid if the point is inside the three other corners)
+        /// Gets the top left point. If this point is not on the hull (inside the other points), the left-most point will be used
         /// </summary>
-        /// <param name="index">The index of the corner to check</param>
-        /// <returns>True if the point is valid and false if it is not</returns>
-        public bool IsCornerValid(int index)
+        /// <param name="corners">The points to find the top left of</param>
+        /// <returns>The top left point of the given points</returns>
+        private PointPos GetTopLeftPointOnHull(List<PointPos> corners)
         {
-            // TODO: implement code
-            return true;
-        }
+            PointPos topLeft = corners[0];
 
-        public PointPos[] GetClockwisePoints()
-        {
-            return MakeClockwise(points);
-        }
-
-        private PointPos[] MakeClockwise(PointPos[] points)
-        {
-            var corners = points.ToList();
-            corners.Sort((corner1, corner2) => corner1.LengthSquared().CompareTo(corner2.LengthSquared()));
-
-            PointPos tl = corners.First();
-            PointPos currentVertex;
-
-            // If top left point is not on the hull, take the left most point to be the top left
-            if (PointInTriangle(tl, corners[1], corners[2], corners[3]))
+            foreach (PointPos p in corners)
             {
-                corners.Sort((corner1, corner2) => corner1.X.CompareTo(corner2.X));
-                tl = corners.First();
+                if (p.LengthSquared() < topLeft.LengthSquared())
+                    topLeft = p;
             }
 
-            currentVertex = tl;
-            List<PointPos> result = new List<PointPos> { currentVertex };
+            List<PointPos> pointsExcludingTopleft = new List<PointPos>(corners);
+            pointsExcludingTopleft.Remove(topLeft);
 
-            int index = 2;
-            int nextIndex = -1;
-            PointPos nextVertex = corners[1];
-
-            while (true)
+            // If the top left point is inside the others (and therefore inside the hull), take the left-most point to ensure the point is on the hull
+            if (PointInTriangle2(topLeft, pointsExcludingTopleft))
             {
-                PointPos checking = corners[index];
-                PointPos a = nextVertex - currentVertex;
-                PointPos b = checking - currentVertex;
-                double cross = a.CrossProduct(b);
-
-                if (cross < 0)
+                foreach (PointPos p in corners)
                 {
-                    nextVertex = checking;
-                    nextIndex = index;
-                }
-
-                index++;
-                if (index == corners.Count)
-                {
-                    if (nextVertex == tl)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        result.Add(nextVertex);
-                        currentVertex = nextVertex;
-                        index = 0;
-                        nextVertex = tl;
-                    }
+                    if (p.X < topLeft.X)
+                        topLeft = p;
                 }
             }
 
-            return result.ToArray();
+            return topLeft;
+        }
+
+        private bool PointInTriangle2(PointPos point, List<PointPos> trianglePoints)
+        {
+            if (trianglePoints.Count != 3) throw new ArgumentException("trianglePoints should contain 3 points");
+            return PointInTriangle(point, trianglePoints[0], trianglePoints[1], trianglePoints[2]);
         }
 
         // NOT MY CODE
