@@ -1,6 +1,5 @@
 ﻿using DigitClassifier;
 using DigitClassifier.Activation_Functions;
-using HelperClasses;
 using System;
 using System.Drawing;
 
@@ -57,8 +56,8 @@ namespace TrainingInterface
                 if (i % 1 == 0)
                 {
                     progressBar.PrintProgress(i);
-                //    Console.WriteLine($"{i}");
-                //    Console.SetCursorPosition(0, Console.CursorTop - 1);
+                    //    Console.WriteLine($"{i}");
+                    //    Console.SetCursorPosition(0, Console.CursorTop - 1);
                 }
             }
             Console.WriteLine();

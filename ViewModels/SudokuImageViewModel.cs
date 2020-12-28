@@ -2,6 +2,8 @@
 using Models;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
@@ -21,6 +23,8 @@ namespace ViewModels
                 Notify(nameof(BitmapImage));
             }
         }
+
+        public Bitmap TmpBitmap { get => sudokuImage.Image; }
 
         public double Threshold
         {

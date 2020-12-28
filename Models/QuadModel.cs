@@ -6,7 +6,7 @@ namespace Models
 {
     public class QuadModel
     {
-        private PointPos[] points = new PointPos[4];
+        private readonly PointPos[] points = new PointPos[4];
         public int Length { get => points.Length; }
 
         public QuadModel(PointPos[] points)

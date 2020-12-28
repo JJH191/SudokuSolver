@@ -1,8 +1,12 @@
-﻿using DigitClassifier;
+﻿using Accord;
+using Accord.Imaging;
+using DigitClassifier;
 using HelperClasses;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,7 +24,7 @@ namespace SudokuSolver
     public partial class ImageAdjustmentsPage : Page
     {
         private readonly SudokuImageViewModel viewModel;
-        private readonly QuadViewModel quadViewModel = new QuadViewModel();
+        private readonly QuadViewModel quadViewModel;
 
         private readonly double circleRadius = 7.5f;
         private int selected = -1;
@@ -31,7 +35,9 @@ namespace SudokuSolver
             viewModel = ((SudokuImageViewModel)DataContext);
 
             viewModel.BitmapImage = new BitmapImage(new Uri(sudokuPath));
-            viewModel.Threshold = 0.5;
+            viewModel.Threshold = 0.6;
+
+            quadViewModel = new QuadViewModel(DetectCorners(new Bitmap(viewModel.TmpBitmap, new System.Drawing.Size((int)image.Width, (int)image.Height))));
 
             // Adds corners clockwise
             Ellipse[] corners = new Ellipse[4];
@@ -48,7 +54,7 @@ namespace SudokuSolver
             // Add bindings for the ellipses drawn at each corner
             IValueConverter converter = new CirclePositionCentreConverter(circleRadius);
             for (int i = 0; i < corners.Length; i++)
-            { 
+            {
                 Binding xBinding = new Binding($"[{i}].X") { Source = quadViewModel, Mode = BindingMode.OneWay, Converter = converter };
                 Binding yBinding = new Binding($"[{i}].Y") { Source = quadViewModel, Mode = BindingMode.OneWay, Converter = converter };
                 corners[i].SetBinding(Canvas.LeftProperty, xBinding);
@@ -56,6 +62,72 @@ namespace SudokuSolver
             }
 
             CreateQuad();
+        }
+
+        // TODO: not my code, Move to another file, Expand corners out a little (around 2px) as it only detects inside of line
+        private PointPos[] DetectCorners(Bitmap image)
+        {
+            // locating objects
+            BlobCounter blobCounter = new BlobCounter
+            {
+                FilterBlobs = true,
+                MinHeight = 30,
+                MinWidth = 30,
+                MaxHeight = 700,
+                MaxWidth = 700
+            };
+
+            blobCounter.ProcessImage(image);
+            Blob[] blobs = blobCounter.GetObjectsInformation();
+
+            // check for rectangles
+            Accord.Math.Geometry.SimpleShapeChecker shapeChecker = new Accord.Math.Geometry.SimpleShapeChecker();
+
+            IntPoint topLeft = new IntPoint(image.Width, image.Height); // Start with max distance from top left
+            IntPoint topRight = new IntPoint(0, image.Height); // Start with max distance from top right
+            IntPoint bottomRight = new IntPoint(0, 0); // Start with max distance from bottom right
+            IntPoint bottomLeft = new IntPoint(image.Width, 0); // Start with max distance from bottom left
+
+            foreach (var blob in blobs)
+            {
+                List<IntPoint> edgePoints = blobCounter.GetBlobsEdgePoints(blob);
+
+                if (shapeChecker.IsQuadrilateral(edgePoints, out List<IntPoint> cornerPoints))
+                {
+                    if (IsAnySubtype(shapeChecker, cornerPoints, Accord.Math.Geometry.PolygonSubType.Parallelogram, Accord.Math.Geometry.PolygonSubType.Rectangle, Accord.Math.Geometry.PolygonSubType.Square))
+                    {
+                        List<PointF> Points = new List<PointF>();
+                        foreach (var point in cornerPoints)
+                        {
+                            Points.Add(new PointF(point.X, point.Y));
+
+                            // Could optimise by keeping track of distance rather than recalculating
+                            if (point.SquaredDistanceTo(new IntPoint(0, 0)) < topLeft.SquaredDistanceTo(new IntPoint(0, 0))) topLeft = point;
+                            if (point.SquaredDistanceTo(new IntPoint(image.Width, 0)) < topRight.SquaredDistanceTo(new IntPoint(image.Width, 0))) topRight = point;
+                            if (point.SquaredDistanceTo(new IntPoint(image.Width, image.Height)) < bottomRight.SquaredDistanceTo(new IntPoint(image.Width, image.Height))) bottomRight = point;
+                            if (point.SquaredDistanceTo(new IntPoint(0, image.Height)) < bottomLeft.SquaredDistanceTo(new IntPoint(0, image.Height))) bottomLeft = point;
+                        }
+                    }
+                }
+            }
+
+            int expand = 3;
+            PointPos[] corners = new PointPos[]
+            {
+                // Expand the bounds by a bit as the detection finds the inside of the line
+                new PointPos(topLeft.X - expand, topLeft.Y - expand),
+                new PointPos(topRight.X + expand, topRight.Y - expand),
+                new PointPos(bottomRight.X + expand, bottomRight.Y + expand),
+                new PointPos(bottomLeft.X - expand, bottomLeft.Y + expand),
+            };
+
+            return corners;
+        }
+
+        private bool IsAnySubtype(Accord.Math.Geometry.SimpleShapeChecker shapeChecker, List<IntPoint> corners, params Accord.Math.Geometry.PolygonSubType[] subTypes)
+        {
+            Accord.Math.Geometry.PolygonSubType subType = shapeChecker.CheckPolygonSubType(corners);
+            return subTypes.Contains(subType);
         }
 
         /// <summary>
@@ -84,7 +156,15 @@ namespace SudokuSolver
         {
             viewModel.Grayscale();
         }
-        
+
+        private void Btn_EstimateCorners(object sender, RoutedEventArgs e)
+        {
+            //if (quadViewModel == null) return;
+            PointPos[] corners = DetectCorners(new Bitmap(viewModel.TmpBitmap, new System.Drawing.Size((int)image.Width, (int)image.Height)));
+            for (int i = 0; i < corners.Count(); i++)
+                quadViewModel[i] = corners[i];
+        }
+
         /// <summary>
         /// Update the selected corner position to the mouse position
         /// </summary>
@@ -142,7 +222,7 @@ namespace SudokuSolver
             adjustedImage.Save("CleanedImage.png");
             float cellSize = adjustedImage.Width / 9f;
 
-            int[,] sudoku = new int[9,9];
+            int[,] sudoku = new int[9, 9];
             NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("neural_network.nn");
 
             for (int j = 0; j < 9; j++)
@@ -158,17 +238,14 @@ namespace SudokuSolver
 
                     float emptyThreshold = 0.02f;
                     if (cell.GetAverageBrightness() < emptyThreshold) sudoku[i, j] = -1;
-                    else
-                    {
-                        sudoku[i, j] = classifier.GetDigit(cell);
-                        Debug.WriteLine(sudoku[i, j]);
-                    }
+                    else sudoku[i, j] = classifier.GetDigit(cell);
                 }
             }
 
             // TODO: Navigate to next page with sudoku grid
+            NavigationService.Navigate(new EditingPage(sudoku));
         }
-        
+
         // NOT MY CODE
         private Bitmap Invert(Bitmap image)
         {

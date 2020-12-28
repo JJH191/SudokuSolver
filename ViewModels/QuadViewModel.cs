@@ -10,14 +10,15 @@ namespace ViewModels
     {
         private readonly QuadModel quad;
 
-        public QuadViewModel()
+        public QuadViewModel(PointPos[] quad)
         {
-            quad = new QuadModel(new PointPos[] { 
-                new PointPos(100, 100), 
-                new PointPos(100, 200), 
-                new PointPos(200, 200), 
-                new PointPos(200, 100), 
-            });
+            //quad = new QuadModel(new PointPos[] {
+            //    new PointPos(100, 100),
+            //    new PointPos(100, 200),
+            //    new PointPos(200, 200),
+            //    new PointPos(200, 100),
+            //});
+            this.quad = new QuadModel(quad);
         }
 
         public Point this[int index]

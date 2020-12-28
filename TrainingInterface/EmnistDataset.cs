@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrainingInterface
 {
@@ -17,7 +14,7 @@ namespace TrainingInterface
             string imagesPath = Path.Combine(directory, "emnist-digits-train-images-idx3-ubyte");
             string labelsPath = Path.Combine(directory, "emnist-digits-train-labels-idx1-ubyte");
 
-            using (BinaryReader brImages = new BinaryReader(new FileStream(imagesPath, FileMode.Open)), 
+            using (BinaryReader brImages = new BinaryReader(new FileStream(imagesPath, FileMode.Open)),
                 brLabels = new BinaryReader(new FileStream(labelsPath, FileMode.Open)))
             {
                 int magic1 = ReadInt32Endian(brImages);
@@ -29,9 +26,9 @@ namespace TrainingInterface
 
                 int magic2 = ReadInt32Endian(brLabels);
                 int numLabels = ReadInt32Endian(brLabels);
-                
-                if (magic2 != 2049)  throw new Exception($"Invalid magic number {magic2}!");
-                if (numLabels != numImages)  throw new Exception($"Number of labels ({numLabels}) does not equal number of images ({numImages})");
+
+                if (magic2 != 2049) throw new Exception($"Invalid magic number {magic2}!");
+                if (numLabels != numImages) throw new Exception($"Number of labels ({numLabels}) does not equal number of images ({numImages})");
 
                 inputData = new InputData[numImages];
 

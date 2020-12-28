@@ -10,10 +10,11 @@ namespace Models
 {
     public class SudokuImageModel
     {
-        private static readonly int imageDisplaySize = 500;
+        private static readonly int imageDisplaySize = 1000;
 
         private Bitmap original;
         private Bitmap current;
+
         public Bitmap Image
         {
             get => current;
@@ -43,14 +44,14 @@ namespace Models
 
                 var ia = new ImageAttributes();
                 ia.SetColorMatrix(new ColorMatrix(gray_matrix));
-                //ia.SetThreshold((float)Threshold); // Change this threshold as needed
+                ia.SetThreshold((float)Threshold); // Change this threshold as needed
 
                 var rc = new Rectangle(0, 0, original.Width, original.Height);
                 gr.DrawImage(original, rc, 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, ia);
             }
 
             // TODO: Try neural network with greyscale rather than pure black/white
-            current = AdjustContrast(current, (int)(Threshold * 200));
+            //current = AdjustContrast(current, (int)(Threshold * 200));
         }
 
         // NOT MY CODE

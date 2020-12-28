@@ -49,6 +49,7 @@
     <Compile Include="CirclePositionCentreConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuadViewModel.cs" />
+    <Compile Include="SudokuGridViewModel.cs" />
     <Compile Include="SudokuImageViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
