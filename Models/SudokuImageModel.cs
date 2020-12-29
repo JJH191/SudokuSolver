@@ -14,7 +14,7 @@ namespace Models
     public class SudokuImageModel
     {
         // Size of the image - images are scaled down to this size to make filters run quicker
-        private static readonly int imageSize = 800;
+        private static readonly int imageSize = 1000;
 
         private Bitmap original; // Keeps track of the unfiltered image (so filter parameters can be tweaked)
         private Bitmap current; // Keeps track of the greyscale image
@@ -120,7 +120,7 @@ namespace Models
         /// </summary>
         /// <param name="quad">The quadrilateral that defines where the sudoku is in the image</param>
         /// <returns>A square image that contains only the sudoku</returns>
-        public Bitmap GetAdjustedImage(PointPos[] quad)
+        public Bitmap GetAdjustedImage(Vector2D[] quad)
         {
             int scaleFactor = 2;
             QuadrilateralTransformation filter = new QuadrilateralTransformation(quad.Select(corner => (IntPoint)corner).ToList(), 28 * 9 * scaleFactor, 28 * 9 * scaleFactor);
@@ -132,12 +132,12 @@ namespace Models
         private Bitmap ResizeImage(Bitmap image, int width)
         {
             int height = (int)((float)width / image.Width * image.Height);
-        
+
             var destRect = new Rectangle(0, 0, width, height);
             var destImage = new Bitmap(width, height);
-        
+
             destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-        
+
             using (var graphics = Graphics.FromImage(destImage))
             {
                 graphics.CompositingMode = CompositingMode.SourceCopy;
@@ -145,14 +145,14 @@ namespace Models
                 graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 graphics.SmoothingMode = SmoothingMode.HighQuality;
                 graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-        
+
                 using (var wrapMode = new ImageAttributes())
                 {
                     wrapMode.SetWrapMode(WrapMode.TileFlipXY);
                     graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
                 }
             }
-        
+
             return destImage;
         }
     }

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -9,13 +8,13 @@ using ViewModels;
 namespace SudokuSolver
 {
     /// <summary>
-    /// Interaction logic for EditingPage.xaml
+    /// Interaction logic for GridPage.xaml
     /// </summary>
-    public partial class EditingPage : Page
+    public partial class GridPage : Page
     {
         public SudokuGridViewModel sudokuGrid;// = new SudokuGridViewModel();
 
-        public EditingPage(int[,] sudoku)
+        public GridPage(int[,] sudoku)
         {
             sudokuGrid = new SudokuGridViewModel(sudoku);
             InitializeComponent();

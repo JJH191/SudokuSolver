@@ -4,7 +4,6 @@ using DigitClassifier;
 using HelperClasses;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows;
@@ -65,7 +64,7 @@ namespace SudokuSolver
         }
 
         // TODO: not my code, Move to another file, Expand corners out a little (around 2px) as it only detects inside of line
-        private PointPos[] DetectCorners(Bitmap image)
+        private Vector2D[] DetectCorners(Bitmap image)
         {
             // locating objects
             BlobCounter blobCounter = new BlobCounter
@@ -112,13 +111,13 @@ namespace SudokuSolver
             }
 
             int expand = 3;
-            PointPos[] corners = new PointPos[]
+            Vector2D[] corners = new Vector2D[]
             {
                 // Expand the bounds by a bit as the detection finds the inside of the line
-                new PointPos(topLeft.X - expand, topLeft.Y - expand),
-                new PointPos(topRight.X + expand, topRight.Y - expand),
-                new PointPos(bottomRight.X + expand, bottomRight.Y + expand),
-                new PointPos(bottomLeft.X - expand, bottomLeft.Y + expand),
+                new Vector2D(topLeft.X - expand, topLeft.Y - expand),
+                new Vector2D(topRight.X + expand, topRight.Y - expand),
+                new Vector2D(bottomRight.X + expand, bottomRight.Y + expand),
+                new Vector2D(bottomLeft.X - expand, bottomLeft.Y + expand),
             };
 
             return corners;
@@ -160,7 +159,7 @@ namespace SudokuSolver
         private void Btn_EstimateCorners(object sender, RoutedEventArgs e)
         {
             //if (quadViewModel == null) return;
-            PointPos[] corners = DetectCorners(new Bitmap(viewModel.TmpBitmap, new System.Drawing.Size((int)image.Width, (int)image.Height)));
+            Vector2D[] corners = DetectCorners(new Bitmap(viewModel.TmpBitmap, new System.Drawing.Size((int)image.Width, (int)image.Height)));
             for (int i = 0; i < corners.Count(); i++)
                 quadViewModel[i] = corners[i];
         }
@@ -174,7 +173,7 @@ namespace SudokuSolver
             if (selected == -1) return;
             System.Windows.Point mousePos = e.GetPosition(canvas);
 
-            quadViewModel[selected] = new PointPos(
+            quadViewModel[selected] = new Vector2D(
                 Math.Max(Math.Min(mousePos.X, canvas.Width), 0),
                 Math.Max(Math.Min(mousePos.Y, canvas.Height), 0)
             );
@@ -191,7 +190,7 @@ namespace SudokuSolver
             // Loop through all the corners
             for (int i = 0; i < quadViewModel.Length; i++)
             {
-                double distSquaredFromPoint = (new PointPos(mousePos) - quadViewModel[i]).LengthSquared();
+                double distSquaredFromPoint = (new Vector2D(mousePos) - quadViewModel[i]).LengthSquared();
 
                 // Check if the mouse position is inside the circle (using length squared as it is more efficient than length)
                 if (distSquaredFromPoint <= circleRadius * circleRadius)
@@ -238,12 +237,18 @@ namespace SudokuSolver
 
                     float emptyThreshold = 0.02f;
                     if (cell.GetAverageBrightness() < emptyThreshold) sudoku[i, j] = -1;
-                    else sudoku[i, j] = classifier.GetDigit(cell);
+                    else
+                    {
+                        int classifiedDigit = classifier.GetDigit(cell);
+
+                        if (classifiedDigit == 0) classifiedDigit = 8; // TODO: work out what number is best to replace 0 with
+                        sudoku[i, j] = classifiedDigit;
+                    }
                 }
             }
 
             // TODO: Navigate to next page with sudoku grid
-            NavigationService.Navigate(new EditingPage(sudoku));
+            NavigationService.Navigate(new GridPage(sudoku));
         }
 
         // NOT MY CODE
@@ -269,14 +274,14 @@ namespace SudokuSolver
             Bitmap result = new Bitmap(source);
             for (int i = 0; i < result.Width; i += 5)
             {
-                if (source.GetPixel(i, 0).GetBrightness() < 0.95f) result = result.FloodFill(new PointPos(i, 0), tolerance: 1f); // Top
-                if (source.GetPixel(i, result.Height - 1).GetBrightness() < 0.95f) result = result.FloodFill(new PointPos(i, result.Height - 1), tolerance: 1f); // Bottom
+                if (source.GetPixel(i, 0).GetBrightness() < 0.95f) result = result.FloodFill(new Vector2D(i, 0), tolerance: 1f); // Top
+                if (source.GetPixel(i, result.Height - 1).GetBrightness() < 0.95f) result = result.FloodFill(new Vector2D(i, result.Height - 1), tolerance: 1f); // Bottom
             }
 
             for (int i = 0; i < result.Height; i += 5)
             {
-                if (source.GetPixel(0, i).GetBrightness() < 0.95f) result = result.FloodFill(new PointPos(0, i), tolerance: 1f); // Left
-                if (source.GetPixel(result.Width - 1, i).GetBrightness() < 0.95f) result = result.FloodFill(new PointPos(result.Width - 1, i), tolerance: 1f); // Right
+                if (source.GetPixel(0, i).GetBrightness() < 0.95f) result = result.FloodFill(new Vector2D(0, i), tolerance: 1f); // Left
+                if (source.GetPixel(result.Width - 1, i).GetBrightness() < 0.95f) result = result.FloodFill(new Vector2D(result.Width - 1, i), tolerance: 1f); // Right
             }
 
             return result;

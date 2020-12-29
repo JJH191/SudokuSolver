@@ -1,7 +1,6 @@
 ﻿using HelperClasses;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Models
 {
@@ -10,13 +9,13 @@ namespace Models
     /// </summary>
     public class QuadModel
     {
-        private readonly PointPos[] points = new PointPos[4];
+        private readonly Vector2D[] points = new Vector2D[4];
 
         /// <summary>
         /// Creates a new quad model with the points specified
         /// </summary>
         /// <param name="points">The corners of the quad to start with</param>
-        public QuadModel(PointPos[] points)
+        public QuadModel(Vector2D[] points)
         {
             this.points = points;
         }
@@ -26,7 +25,7 @@ namespace Models
         /// </summary>
         /// <param name="index">The index of the point to get</param>
         /// <returns></returns>
-        public PointPos this[int index]
+        public Vector2D this[int index]
         {
             get => points[index]; // Get the point
             set => points[index] = value; // Set the point
@@ -38,7 +37,7 @@ namespace Models
         /// NOTE: If one point is inside the others, it will not be included in the hull, so the hull will only contain 3 points
         /// </summary>
         /// <returns>The corners of the quad in clockwise order</returns>
-        public PointPos[] GetClockwiseHull()
+        public Vector2D[] GetClockwiseHull()
         {
             // This algorithm works by starting with the top left point
             // With this top left point, it will loop through all the other points and find the relative vector to them
@@ -46,29 +45,29 @@ namespace Models
             // The smallest angle will be the next point in the hull, going clockwise
             // Once the top left point is reached again, the hull is complete
 
-            List<PointPos> cornersLeft = new List<PointPos>(points); // Keeps track of the corners left to add to the hull
+            List<Vector2D> cornersLeft = new List<Vector2D>(points); // Keeps track of the corners left to add to the hull
 
             // Get the top left point and start with that
-            PointPos topLeft = GetTopLeftPointOnHull(cornersLeft);
-            PointPos current = topLeft; 
+            Vector2D topLeft = GetTopLeftPointOnHull(cornersLeft);
+            Vector2D current = topLeft;
             //cornersLeft.Remove(current);
 
             // The hull of the quad's points in a clockwise order, starting with the top left
-            List<PointPos> clockwiseHull = new List<PointPos> { current };
+            List<Vector2D> clockwiseHull = new List<Vector2D> { current };
 
             // Loop until no corners left to add
             while (cornersLeft.Count > 0)
             {
                 // Set the smallest angle to the angle between the top left and first corner in cornersLeft
-                PointPos smallestAnglePos = cornersLeft[0];
+                Vector2D smallestAnglePos = cornersLeft[0];
 
                 // Get the angle, clockwise, from negative y-axis (negative y is used here because angle expects up to be positive, but images take down as positive)
-                double smallestAngle = (smallestAnglePos - current).Angle(axis: PointPos.Axis.NEG_Y, direction: PointPos.Direction.CLOCKWISE); 
+                double smallestAngle = (smallestAnglePos - current).Angle(axis: Vector2D.Axis.NEG_Y, direction: Vector2D.Direction.CLOCKWISE);
 
                 // Loop through the remaining corners and find the one with the smallest angle between it and the current corner
-                foreach (PointPos corner in cornersLeft)
+                foreach (Vector2D corner in cornersLeft)
                 {
-                    double angle = (corner - current).Angle(axis: PointPos.Axis.NEG_Y, direction: PointPos.Direction.CLOCKWISE);
+                    double angle = (corner - current).Angle(axis: Vector2D.Axis.NEG_Y, direction: Vector2D.Direction.CLOCKWISE);
                     if (angle < smallestAngle)
                     {
                         smallestAngle = angle;
@@ -92,23 +91,23 @@ namespace Models
         /// </summary>
         /// <param name="corners">The points to find the top left of</param>
         /// <returns>The top left point of the given points</returns>
-        private PointPos GetTopLeftPointOnHull(List<PointPos> corners)
+        private Vector2D GetTopLeftPointOnHull(List<Vector2D> corners)
         {
-            PointPos topLeft = corners[0];
+            Vector2D topLeft = corners[0];
 
-            foreach (PointPos p in corners)
+            foreach (Vector2D p in corners)
             {
                 if (p.LengthSquared() < topLeft.LengthSquared())
                     topLeft = p;
             }
 
-            List<PointPos> pointsExcludingTopleft = new List<PointPos>(corners);
+            List<Vector2D> pointsExcludingTopleft = new List<Vector2D>(corners);
             pointsExcludingTopleft.Remove(topLeft);
 
             // If the top left point is inside the others (and therefore inside the hull), take the left-most point to ensure the point is on the hull
             if (PointInTriangle2(topLeft, pointsExcludingTopleft))
             {
-                foreach (PointPos p in corners)
+                foreach (Vector2D p in corners)
                 {
                     if (p.X < topLeft.X)
                         topLeft = p;
@@ -118,20 +117,20 @@ namespace Models
             return topLeft;
         }
 
-        private bool PointInTriangle2(PointPos point, List<PointPos> trianglePoints)
+        private bool PointInTriangle2(Vector2D point, List<Vector2D> trianglePoints)
         {
             if (trianglePoints.Count != 3) throw new ArgumentException("trianglePoints should contain 3 points");
             return PointInTriangle(point, trianglePoints[0], trianglePoints[1], trianglePoints[2]);
         }
 
         // NOT MY CODE
-        private double AreaOfTriangle(PointPos p1, PointPos p2, PointPos p3)
+        private double AreaOfTriangle(Vector2D p1, Vector2D p2, Vector2D p3)
         {
             return (p1.X - p3.X) * (p2.Y - p3.Y) - (p2.X - p3.X) * (p1.Y - p3.Y);
         }
 
         // NOT MY CODE
-        private bool PointInTriangle(PointPos pt, PointPos v1, PointPos v2, PointPos v3)
+        private bool PointInTriangle(Vector2D pt, Vector2D v1, Vector2D v2, Vector2D v3)
         {
             double d1, d2, d3;
             bool has_neg, has_pos;

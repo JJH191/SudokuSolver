@@ -21,7 +21,7 @@ namespace TrainingInterface
         private readonly bool printPercentage; // Whether the percentage should be printed after the bar
 
         // Keeps track of whether it is the first print so that the cursor is only reset on subsequent calls of PrintProgress
-        private bool isFirstPrint = true; 
+        private bool isFirstPrint = true;
 
         /// <summary>
         /// Create a new progress bar

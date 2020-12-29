@@ -42,19 +42,19 @@ namespace HelperClasses
         /// <param name="brightness">The brightness of the colour to replace (brightness is used as it is faster than a full colour and the image is greyscale anyway)</param>
         /// <param name="tolerance">The amount a pixel to fill can vary from the given brightness</param>
         /// <returns>A new image with the flood filled bitmap</returns>
-        public static Bitmap FloodFill(this Bitmap image, PointPos startPixelPos, Colour fillCol = null, float brightness = 0, float tolerance = 0.1f)
+        public static Bitmap FloodFill(this Bitmap image, Vector2D startPixelPos, Colour fillCol = null, float brightness = 0, float tolerance = 0.1f)
         {
             if (fillCol == null) fillCol = Colors.White; // Default fill colour is white
             Bitmap result = new Bitmap(image); // Copy the bitmap so it doesn't affect the original
 
             // Create a new stack with a start length of 20 and push the first pixel to fill
-            Stack<PointPos> pixelsToFill = new Stack<PointPos>(20);
+            Stack<Vector2D> pixelsToFill = new Stack<Vector2D>(20);
             pixelsToFill.Push(startPixelPos);
 
             // Loop while there are still pixels to fill
             while (pixelsToFill.Count > 0)
             {
-                PointPos currentPixel = pixelsToFill.Pop(); // Get the pixel on the top of the stack
+                Vector2D currentPixel = pixelsToFill.Pop(); // Get the pixel on the top of the stack
 
                 // Make sure the pixel is one within the bounds of the image - if not, skip
                 int x = (int)currentPixel.X;
@@ -70,7 +70,7 @@ namespace HelperClasses
                     // Add neighbouring pixels to stack
                     for (int i = x - 1; i <= x + 1; i++)
                         for (int j = y - 1; j <= y + 1; j++)
-                            pixelsToFill.Push(new PointPos(i, j));
+                            pixelsToFill.Push(new Vector2D(i, j));
                     // NOTE: Does not matter that I'm adding the current pixel to the stack as it will already be filled to the new colour so the flood fill will not do anything
                 }
             }

@@ -6,14 +6,14 @@ namespace Models
     /// A class to store the contents of a sudoku grid, including functionality such as solving and checking if the board is valid
     /// </summary>
     public class SudokuGridModel
-    { 
+    {
         public int[,] Data { get; private set; }
 
         /// <summary>
         /// Create a new sudoku grid with the provided <paramref name="data"/>
         /// </summary>
         /// <param name="data">Data to fill the sudoku grid with</param>
-        public SudokuGridModel(int [,] data)
+        public SudokuGridModel(int[,] data)
         {
             Data = data;
         }
@@ -82,7 +82,7 @@ namespace Models
                                 // If the rest could not be solved, set the cell back to empty
                                 if (!SolveSudokuHelper(ref grid)) grid[i, j] = -1;
                                 // If the rest could be solved, and the grid is now complete, the sudoku is solved, so return true
-                                else if (IsFull(grid)) return true; 
+                                else if (IsFull(grid)) return true;
                             }
                         }
 

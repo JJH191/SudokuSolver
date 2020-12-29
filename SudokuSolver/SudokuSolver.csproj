@@ -89,8 +89,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="EditingPage.xaml.cs">
-      <DependentUpon>EditingPage.xaml</DependentUpon>
+    <Compile Include="GridPage.xaml.cs">
+      <DependentUpon>GridPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="ImageAdjustmentsPage.xaml.cs">
       <DependentUpon>ImageAdjustmentsPage.xaml</DependentUpon>
@@ -98,7 +98,7 @@
     <Compile Include="WelcomePage.xaml.cs">
       <DependentUpon>WelcomePage.xaml</DependentUpon>
     </Compile>
-    <Page Include="EditingPage.xaml">
+    <Page Include="GridPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

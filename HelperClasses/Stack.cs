@@ -36,7 +36,7 @@ namespace HelperClasses
             }
 
             // Add the item to the array and increment the Count for the next item
-            data[Count++] = item; 
+            data[Count++] = item;
         }
 
         /// <summary>
