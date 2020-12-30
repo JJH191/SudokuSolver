@@ -110,17 +110,23 @@ namespace SudokuSolver
                 }
             }
 
+            // BUG: TODO: goes outside image bounds
+            // Expand the bounds by a bit as the detection finds the inside of the line
             int expand = 3;
             Vector2D[] corners = new Vector2D[]
             {
-                // Expand the bounds by a bit as the detection finds the inside of the line
-                new Vector2D(topLeft.X - expand, topLeft.Y - expand),
-                new Vector2D(topRight.X + expand, topRight.Y - expand),
-                new Vector2D(bottomRight.X + expand, bottomRight.Y + expand),
-                new Vector2D(bottomLeft.X - expand, bottomLeft.Y + expand),
+                new Vector2D(ClampToBounds(topLeft.X - expand, max: image.Width - 1), ClampToBounds(topLeft.Y - expand, max: image.Height - 1)),
+                new Vector2D(ClampToBounds(topRight.X + expand, max: image.Width - 1), ClampToBounds(topRight.Y - expand, max: image.Height - 1)),
+                new Vector2D(ClampToBounds(bottomRight.X + expand, max: image.Width - 1), ClampToBounds(bottomRight.Y + expand, max: image.Height - 1)),
+                new Vector2D(ClampToBounds(bottomLeft.X - expand, max: image.Width - 1), ClampToBounds(bottomLeft.Y + expand, max: image.Height - 1)),
             };
 
             return corners;
+        }
+
+        private double ClampToBounds(double value, double max, double min = 0)
+        {
+            return Math.Max(Math.Min(value, max), min);
         }
 
         private bool IsAnySubtype(Accord.Math.Geometry.SimpleShapeChecker shapeChecker, List<IntPoint> corners, params Accord.Math.Geometry.PolygonSubType[] subTypes)

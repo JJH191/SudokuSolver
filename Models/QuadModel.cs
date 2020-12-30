@@ -50,7 +50,7 @@ namespace Models
             // Get the top left point and start with that
             Vector2D topLeft = GetTopLeftPointOnHull(cornersLeft);
             Vector2D current = topLeft;
-            //cornersLeft.Remove(current);
+            cornersLeft.Remove(current);
 
             // The hull of the quad's points in a clockwise order, starting with the top left
             List<Vector2D> clockwiseHull = new List<Vector2D> { current };
@@ -58,29 +58,33 @@ namespace Models
             // Loop until no corners left to add
             while (cornersLeft.Count > 0)
             {
-                // Set the smallest angle to the angle between the top left and first corner in cornersLeft
-                Vector2D smallestAnglePos = cornersLeft[0];
-
-                // Get the angle, clockwise, from negative y-axis (negative y is used here because angle expects up to be positive, but images take down as positive)
-                double smallestAngle = (smallestAnglePos - current).Angle(axis: Vector2D.Axis.NEG_Y, direction: Vector2D.Direction.CLOCKWISE);
+                // Start with smallest angle as 2pi (the maximum  possible angle) and no smallest angle corner
+                Vector2D smallestAngleCorner = null;
+                double smallestAngle = Math.PI * 2;
 
                 // Loop through the remaining corners and find the one with the smallest angle between it and the current corner
                 foreach (Vector2D corner in cornersLeft)
                 {
+                    // Get the angle, clockwise, from negative y-axis (negative y is used here because angle expects up to be positive, but images take down as positive)
                     double angle = (corner - current).Angle(axis: Vector2D.Axis.NEG_Y, direction: Vector2D.Direction.CLOCKWISE);
                     if (angle < smallestAngle)
                     {
                         smallestAngle = angle;
-                        smallestAnglePos = corner;
+                        smallestAngleCorner = corner;
                     }
                 }
 
                 // If we have reached the start again, the hull is complete, so exit
-                if (smallestAnglePos == topLeft) break;
+                //if (smallestAnglePos == topLeft) break;
+                if (current != topLeft)
+                {
+                    double angleToStart = (topLeft - current).Angle(axis: Vector2D.Axis.NEG_Y, direction: Vector2D.Direction.CLOCKWISE);
+                    if (angleToStart < smallestAngle) break;
+                }
 
-                clockwiseHull.Add(smallestAnglePos); // Add the new point to the hull
-                cornersLeft.Remove(smallestAnglePos); // Remove the point from cornersLeft so it isn't checked again
-                current = smallestAnglePos; // Change the current point to continue the hull from there
+                clockwiseHull.Add(smallestAngleCorner); // Add the new point to the hull
+                cornersLeft.Remove(smallestAngleCorner); // Remove the point from cornersLeft so it isn't checked again
+                current = smallestAngleCorner; // Change the current point to continue the hull from there
             }
 
             return clockwiseHull.ToArray();
