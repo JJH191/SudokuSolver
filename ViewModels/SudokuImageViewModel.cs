@@ -3,7 +3,6 @@ using Models;
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
 
@@ -13,17 +12,16 @@ namespace ViewModels
     {
         private readonly SudokuImageModel sudokuImage = new SudokuImageModel();
 
-        public BitmapImage BitmapImage
+        public Bitmap Image
         {
-            get => Bitmap2BitmapImage(sudokuImage.Image);
+            get => sudokuImage.Image;
             set
             {
-                sudokuImage.Image = BitmapImage2Bitmap(value);
-                Notify(nameof(BitmapImage));
+                sudokuImage.Image = value;
+                Notify(nameof(Image));
             }
         }
 
-        public Bitmap TmpBitmap { get => sudokuImage.Image; }
 
         public double Threshold
         {
@@ -38,52 +36,17 @@ namespace ViewModels
         public void Grayscale()
         {
             sudokuImage.Grayscale();
-            Notify(nameof(BitmapImage));
+            Notify(nameof(Image));
         }
 
-        public Bitmap GetAdjustedImage(QuadViewModel quad, double ActualWidth)
+        public Bitmap GetAdjustedImage(QuadViewModel quad)
         {
-            // Due to DPI scaling, the width on the canvas is not always the same as the actual width of the image, so I scale the image to account for this so the quad ends up in the right spot
-            double scaleFactor = sudokuImage.Image.Width / ActualWidth;
-            Vector2D[] clockwisePoints = quad.GetModel().GetClockwiseHull().Select(point => point * scaleFactor).ToArray();
+            Vector2D[] clockwisePoints = quad.GetModel().GetClockwiseHull();
 
             // TODO: deal with invalid corner
             if (clockwisePoints.Length != 4) throw new Exception("Invalid corners!");
 
             return sudokuImage.GetAdjustedImage(clockwisePoints);
-        }
-
-        // Not my code
-        private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
-        {
-            if (bitmapImage == null) return null;
-
-            using (MemoryStream outStream = new MemoryStream())
-            {
-                BitmapEncoder enc = new BmpBitmapEncoder();
-                enc.Frames.Add(BitmapFrame.Create(bitmapImage));
-                enc.Save(outStream);
-
-                Bitmap bitmap = new Bitmap(outStream);
-                return new Bitmap(bitmap);
-            }
-        }
-
-        private BitmapImage Bitmap2BitmapImage(Bitmap bitmap)
-        {
-            if (bitmap == null) return null;
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                ms.Position = 0;
-
-                BitmapImage bImg = new BitmapImage();
-                bImg.BeginInit();
-                bImg.StreamSource = new MemoryStream(ms.ToArray());
-                bImg.EndInit();
-
-                return bImg;
-            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

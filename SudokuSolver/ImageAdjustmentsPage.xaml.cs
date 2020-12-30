@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ViewModels;
+using ViewModels.Converters;
 
 namespace SudokuSolver
 {
@@ -33,10 +34,12 @@ namespace SudokuSolver
             InitializeComponent();
             viewModel = ((SudokuImageViewModel)DataContext);
 
-            viewModel.BitmapImage = new BitmapImage(new Uri(sudokuPath));
+            viewModel.Image = new Bitmap(sudokuPath);
             viewModel.Threshold = 0.6;
 
-            quadViewModel = new QuadViewModel(DetectCorners(new Bitmap(viewModel.TmpBitmap, new System.Drawing.Size((int)image.Width, (int)image.Height))));
+            //Bitmap resizedBitmap = new Bitmap(viewModel.Image, new System.Drawing.Size((int)image.Width, (int)image.Height));
+            Vector2D[] detectedCorners = DetectCorners(viewModel.Image);
+            quadViewModel = new QuadViewModel(detectedCorners);
 
             // Adds corners clockwise
             Ellipse[] corners = new Ellipse[4];
@@ -164,8 +167,7 @@ namespace SudokuSolver
 
         private void Btn_EstimateCorners(object sender, RoutedEventArgs e)
         {
-            //if (quadViewModel == null) return;
-            Vector2D[] corners = DetectCorners(new Bitmap(viewModel.TmpBitmap, new System.Drawing.Size((int)image.Width, (int)image.Height)));
+            Vector2D[] corners = DetectCorners(viewModel.Image);// new Bitmap(viewModel.Image, new System.Drawing.Size((int)image.Width, (int)image.Height)));
             for (int i = 0; i < corners.Count(); i++)
                 quadViewModel[i] = corners[i];
         }
@@ -222,38 +224,40 @@ namespace SudokuSolver
         /// </summary>
         private void Btn_Next(object sender, RoutedEventArgs e)
         {
-            Bitmap adjustedImage = viewModel.GetAdjustedImage(quadViewModel, canvas.ActualWidth);
-            adjustedImage = Invert(RemoveBorders(adjustedImage));
-            adjustedImage.Save("CleanedImage.png");
-            float cellSize = adjustedImage.Width / 9f;
+            Bitmap adjustedImage = viewModel.GetAdjustedImage(quadViewModel);
+            adjustedImage = Invert(RemoveBorders(adjustedImage)); // Remove the borders of the sudoku and invert the colours so the image works with the neural network
+            adjustedImage.Save("CleanedImage.png"); // TODO: saving for debugging purposes
+            float cellSize = adjustedImage.Width / 9f; // Get the size of an individual cell
 
             int[,] sudoku = new int[9, 9];
-            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("neural_network.nn");
+            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("neural_network.nn"); // Create the classifier from the saved model
 
             for (int j = 0; j < 9; j++)
             {
                 for (int i = 0; i < 9; i++)
                 {
+                    // Work out the pixel coords of the cell
                     float x = cellSize * i;
                     float y = cellSize * j;
 
+                    // Get an individual cell image
                     Bitmap cell = adjustedImage.Clone(new System.Drawing.Rectangle((int)x, (int)y, (int)cellSize, (int)cellSize), adjustedImage.PixelFormat);
 
-                    //cell.Save($"{i},{j}.png");
-
-                    float emptyThreshold = 0.02f;
-                    if (cell.GetAverageBrightness() < emptyThreshold) sudoku[i, j] = -1;
+                    float emptyThreshold = 0.02f; // Threshold to class a cell as empty
+                    if (cell.GetAverageBrightness() < emptyThreshold) sudoku[i, j] = -1; // If the cell is empty, set its value to -1
                     else
                     {
+                        // Classify the digit
                         int classifiedDigit = classifier.GetDigit(cell);
 
+                        // If the digit is classified as 0 (which is not valid in sudoku), change it
                         if (classifiedDigit == 0) classifiedDigit = 8; // TODO: work out what number is best to replace 0 with
                         sudoku[i, j] = classifiedDigit;
                     }
                 }
             }
 
-            // TODO: Navigate to next page with sudoku grid
+            // Navigate to next page with the sudoku grid
             NavigationService.Navigate(new GridPage(sudoku));
         }
 

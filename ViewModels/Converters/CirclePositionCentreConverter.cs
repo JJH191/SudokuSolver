@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace ViewModels
+namespace ViewModels.Converters
 {
     /// <summary>
     /// Converts the value given so that the centre of the circle is aligned to it

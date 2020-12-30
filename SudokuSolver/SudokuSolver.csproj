@@ -95,6 +95,12 @@
     <Compile Include="ImageAdjustmentsPage.xaml.cs">
       <DependentUpon>ImageAdjustmentsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ReviewEntryDetailsWindow.xaml.cs">
+      <DependentUpon>ReviewEntryDetailsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ReviewPage.xaml.cs">
+      <DependentUpon>ReviewPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WelcomePage.xaml.cs">
       <DependentUpon>WelcomePage.xaml</DependentUpon>
     </Compile>
@@ -118,6 +124,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ReviewEntryDetailsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ReviewPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WelcomePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

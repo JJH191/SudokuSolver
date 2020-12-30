@@ -32,7 +32,7 @@ namespace SudokuSolver
 
         private void Btn_Review(object sender, RoutedEventArgs e)
         {
-
+            NavigationService.Navigate(new ReviewPage());
         }
     }
 }
