@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 namespace ViewModels.Converters
 {
+    /// <summary>
+    /// Converts a given bitmap to a bitmapImage
+    /// Used to display a bitmap in a control through WPF
+    /// </summary>
     public class BitmapToBitmapImage : IValueConverter
     {
         // TODO: Not my code
@@ -18,20 +19,17 @@ namespace ViewModels.Converters
         {
             Bitmap bitmap = (Bitmap)value;
             if (bitmap == null) return null;
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                ms.Position = 0;
 
-                BitmapImage bImg = new BitmapImage();
-                bImg.BeginInit();
-                bImg.StreamSource = new MemoryStream(ms.ToArray());
-                bImg.EndInit();
+            BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
+                bitmap.GetHbitmap(),
+                IntPtr.Zero, Int32Rect.Empty,
+                BitmapSizeOptions.FromWidthAndHeight(bitmap.Width, bitmap.Height)
+            );
 
-                return bImg;
-            }
+            return bitmapSource;
         }
 
+        // Should not need to convert back
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();

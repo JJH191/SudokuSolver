@@ -1,6 +1,7 @@
 ﻿using Accord;
 using Accord.Imaging.Filters;
 using HelperClasses;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -19,6 +20,7 @@ namespace Models
         private Bitmap original; // Keeps track of the unfiltered image (so filter parameters can be tweaked)
         private Bitmap current; // Keeps track of the greyscale image
 
+        // Public property used to access the sudoku image
         public Bitmap Image
         {
             get => current; // Return the greyscale
@@ -26,7 +28,7 @@ namespace Models
             {
                 current = ResizeImage(value, imageSize); // Scale the image down
                 original = new Bitmap(current); // Save the original image
-                Grayscale(); // Greyscale the current image
+                Greyscale(); // Greyscale the current image
             }
         }
 
@@ -34,7 +36,7 @@ namespace Models
         public double Threshold { get; set; }
 
         // TODO: Not my code
-        public void Grayscale()
+        public void Greyscale()
         {
             using (Graphics gr = Graphics.FromImage(current))
             {
@@ -123,8 +125,12 @@ namespace Models
         public Bitmap GetAdjustedImage(Vector2D[] quad)
         {
             int scaleFactor = 2;
-            QuadrilateralTransformation filter = new QuadrilateralTransformation(quad.Select(corner => (IntPoint)corner).ToList(), 28 * 9 * scaleFactor, 28 * 9 * scaleFactor);
-            var transformedImage = filter.Apply(current);
+            int size = 28 * 9 * scaleFactor; // Calculate the width and height of the image (they are the same as the image is square)
+
+            List<IntPoint> intPoints = quad.Select(corner => (IntPoint)corner).ToList(); // Convert the quad to a list of IntPoints
+            QuadrilateralTransformation filter = new QuadrilateralTransformation(intPoints, size, size); // Get transformation filter
+
+            Bitmap transformedImage = filter.Apply(current); // Apply transformation to remove any perspective from the original image
             return transformedImage;
         }
 

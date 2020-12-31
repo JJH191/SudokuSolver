@@ -17,6 +17,7 @@ namespace Models
         /// <param name="points">The corners of the quad to start with</param>
         public QuadModel(Vector2D[] points)
         {
+            if (points.Length != 4) throw new ArgumentException("There should be 4 points provided");
             this.points = points;
         }
 
@@ -24,7 +25,7 @@ namespace Models
         /// Get a specific point of the quad at the given <paramref name="index"/>
         /// </summary>
         /// <param name="index">The index of the point to get</param>
-        /// <returns></returns>
+        /// <returns>The point at <paramref name="index"/> from the quad</returns>
         public Vector2D this[int index]
         {
             get => points[index]; // Get the point
@@ -75,7 +76,7 @@ namespace Models
                 }
 
                 // If we have reached the start again, the hull is complete, so exit
-                //if (smallestAnglePos == topLeft) break;
+                // Since we start with the top left, we do not want to check top left with itself
                 if (current != topLeft)
                 {
                     double angleToStart = (topLeft - current).Angle(axis: Vector2D.Axis.NEG_Y, direction: Vector2D.Direction.CLOCKWISE);
@@ -97,20 +98,31 @@ namespace Models
         /// <returns>The top left point of the given points</returns>
         private Vector2D GetTopLeftPointOnHull(List<Vector2D> corners)
         {
-            Vector2D topLeft = corners[0];
+            // Start with null top left point and largest possible distance
+            Vector2D topLeft = null;
+            double shortestDistSquared = double.MaxValue;
 
+            // Loop through all points to find the one with the shortest distance to (0, 0)
             foreach (Vector2D p in corners)
             {
-                if (p.LengthSquared() < topLeft.LengthSquared())
+                // Using length squared as it is quicker to calculate than length (does not require square root)
+                double lengthSquared = p.LengthSquared();
+                if (lengthSquared < shortestDistSquared)
+                {
                     topLeft = p;
+                    shortestDistSquared = lengthSquared;
+                }
             }
 
+            // Get all the points other than the top left
             List<Vector2D> pointsExcludingTopleft = new List<Vector2D>(corners);
             pointsExcludingTopleft.Remove(topLeft);
 
             // If the top left point is inside the others (and therefore inside the hull), take the left-most point to ensure the point is on the hull
+            // This is necessary for GetClockwiseHull to work correctly
             if (PointInTriangle2(topLeft, pointsExcludingTopleft))
             {
+                // Loop through and find the left-most point
                 foreach (Vector2D p in corners)
                 {
                     if (p.X < topLeft.X)

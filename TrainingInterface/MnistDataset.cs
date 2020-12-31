@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace TrainingInterface
 {
+    /// <summary>
+    /// Dataset including the hand-drawn digits from the MNIST dataset
+    /// </summary>
     public class MnistDataset : IDataset
     {
         private readonly InputData[] inputData;
@@ -13,6 +16,7 @@ namespace TrainingInterface
         {
             string[] lines = File.ReadAllLines(path);
 
+            // TODO: Not my code
             inputData = new InputData[lines.Length];
             for (int i = 0; i < lines.Length; i++)
             {
@@ -24,11 +28,9 @@ namespace TrainingInterface
             }
         }
 
-        public InputData[] GetData()
-        {
-            return inputData;
-        }
+        public InputData[] GetData() => inputData;
 
+        // TODO: not my code
         public void Shuffle()
         {
             int n = inputData.Length;

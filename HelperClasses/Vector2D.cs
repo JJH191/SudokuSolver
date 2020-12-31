@@ -97,16 +97,22 @@ namespace HelperClasses
         /// <returns>The angle of the vector in radians</returns>
         public double Angle(Axis axis = Axis.X, Direction direction = Direction.ANTICLOCKWISE)
         {
+            // Get the x and y values
             double x = X;
             double y = Y;
 
+            // If the axis is negative, multiply that component of the vector by -1 (to invert it)
             if (axis == Axis.NEG_X) x *= -1;
             if (axis == Axis.NEG_Y) y *= -1;
 
+            // Get the angle
             double angle = Math.Atan2(y, x);
-            if (axis == Axis.Y || axis == Axis.NEG_Y) angle -= Math.PI / 2;
-            if (direction == Direction.CLOCKWISE) angle *= -1;
 
+            // If it is the Y axis, subtract 0.5pi
+            if (axis == Axis.Y || axis == Axis.NEG_Y) angle -= Math.PI / 2;
+            if (direction == Direction.CLOCKWISE) angle *= -1; // If the angle needs to be clockwise, multiply it by -1 to flip it
+
+            // Normalise the angle between 0 and 2pi
             return NormaliseAngle(angle);
         }
 
@@ -124,6 +130,11 @@ namespace HelperClasses
             return angle % twoPi; // Make sure the angle is between 0 and 2pi
         }
 
+        /// <summary>
+        /// Get the scalar cross product of this vector and <paramref name="other"/>
+        /// </summary>
+        /// <param name="other">The vector to cross product with</param>
+        /// <returns></returns>
         public double CrossProduct(Vector2D other) => X * other.Y - Y * other.X;
         #endregion
 
@@ -134,6 +145,7 @@ namespace HelperClasses
         /// <returns>True if the values are equal, false if not</returns>
         public bool Equals(Vector2D other) => X == other.X && Y == other.Y;
 
+        // Options for getting the angle
         public enum Axis { X, Y, NEG_X, NEG_Y }
         public enum Direction { CLOCKWISE, ANTICLOCKWISE }
     }

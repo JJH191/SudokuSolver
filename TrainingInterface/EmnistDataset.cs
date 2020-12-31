@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace TrainingInterface
 {
+    /// <summary>
+    /// Dataset including the hand-drawn digits from the EMNIST dataset
+    /// </summary>
     public class EmnistDataset : IDataset
     {
         private readonly InputData[] inputData;
@@ -14,6 +17,7 @@ namespace TrainingInterface
             string imagesPath = Path.Combine(directory, "emnist-digits-train-images-idx3-ubyte");
             string labelsPath = Path.Combine(directory, "emnist-digits-train-labels-idx1-ubyte");
 
+            // TODO: Not my code
             using (BinaryReader brImages = new BinaryReader(new FileStream(imagesPath, FileMode.Open)),
                 brLabels = new BinaryReader(new FileStream(labelsPath, FileMode.Open)))
             {
@@ -43,11 +47,9 @@ namespace TrainingInterface
             }
         }
 
-        public InputData[] GetData()
-        {
-            return inputData;
-        }
+        public InputData[] GetData() => inputData;
 
+        // TODO: Not my code
         public void Shuffle()
         {
             int n = inputData.Length;
@@ -61,6 +63,7 @@ namespace TrainingInterface
             }
         }
 
+        // TODO: Not my code
         private int ReadInt32Endian(BinaryReader br)
         {
             var bytes = br.ReadBytes(sizeof(int));
@@ -69,6 +72,7 @@ namespace TrainingInterface
             return BitConverter.ToInt32(bytes, 0);
         }
 
+        // TODO: Not my code
         private double[] Transpose(double[] data, int width, int height)
         {
             double[] transposed = new double[data.Length];

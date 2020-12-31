@@ -9,6 +9,7 @@ namespace ViewModels.Converters
     /// </summary>
     public class CirclePositionCentreConverter : IValueConverter
     {
+        // Radius of the circle being drawn
         private readonly double circleRadius;
 
         public CirclePositionCentreConverter(double circleRadius)
@@ -16,11 +17,13 @@ namespace ViewModels.Converters
             this.circleRadius = circleRadius;
         }
 
+        // Centre the circle by subtracting the radius (half the width) from the x and y coordinates
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return (int)value - circleRadius;
         }
 
+        // Should not need to convert back from the circle's position
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();

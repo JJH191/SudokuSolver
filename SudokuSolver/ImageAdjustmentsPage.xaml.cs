@@ -11,7 +11,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ViewModels;
 using ViewModels.Converters;
@@ -162,7 +161,7 @@ namespace SudokuSolver
         /// </summary>
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            viewModel.Grayscale();
+            viewModel.Greyscale();
         }
 
         private void Btn_EstimateCorners(object sender, RoutedEventArgs e)
@@ -261,7 +260,7 @@ namespace SudokuSolver
             NavigationService.Navigate(new GridPage(sudoku));
         }
 
-        // NOT MY CODE
+        // NOT MY CODE, move to BitmapUtils
         private Bitmap Invert(Bitmap image)
         {
             Bitmap result = new Bitmap(image);
