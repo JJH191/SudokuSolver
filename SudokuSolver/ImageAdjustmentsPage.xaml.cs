@@ -229,7 +229,7 @@ namespace SudokuSolver
             float cellSize = adjustedImage.Width / 9f; // Get the size of an individual cell
 
             int[,] sudoku = new int[9, 9];
-            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("neural_network.nn"); // Create the classifier from the saved model
+            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("trained_network.nn"); // Create the classifier from the saved model
 
             for (int j = 0; j < 9; j++)
             {
@@ -246,6 +246,9 @@ namespace SudokuSolver
                     if (cell.GetAverageBrightness() < emptyThreshold) sudoku[i, j] = -1; // If the cell is empty, set its value to -1
                     else
                     {
+                        cell = CentreDigit(cell); // Centre the digit in the cell so it is more similar to the training data
+                        cell.Save($"{i + 1},{j + 1}.png");
+
                         // Classify the digit
                         int classifiedDigit = classifier.GetDigit(cell);
 
@@ -261,6 +264,55 @@ namespace SudokuSolver
         }
 
         /// <summary>
+        /// Centres a digit within the cell bitmap
+        /// Note: The cell must be already cleaned and inverted for this to work
+        /// </summary>
+        /// <param name="cell">The bitmap containing the digit</param>
+        /// <param name="border">The minimum number of pixels between an edge and the digit</param>
+        /// <returns></returns>
+        private Bitmap CentreDigit(Bitmap cell, int border = 10)
+        {
+            int minX = int.MaxValue, maxX = int.MinValue; // Keeps track of the left-most and right-most white pixel
+            int minY = int.MaxValue, maxY = int.MinValue; // Keeps track of the top-most and bottom-most white pixel
+
+            for (int i = 0; i < cell.Width; i++)
+            {
+                for (int j = 0; j < cell.Height; j++)
+                {
+                    if (cell.GetPixel(i, j).GetBrightness() > 0.95f) // If the pixel is white
+                    {
+                        // Check if it should be the new minimum or maximum
+                        if (i < minX) minX = i;
+                        if (i > maxX) maxX = i;
+                        if (j < minY) minY = j;
+                        if (j > maxY) maxY = j;
+                    }
+                }
+            }
+
+            // Find the centre of the rectangle containing the digit
+            int centreX = (maxX + minX) / 2;
+            int centreY = (maxY + minY) / 2;
+
+            // Get the largest dimension of the rectangle
+            // This is so that the source rectangle is square to prevent any stretching
+            int maxOfWidthAndHeight = Math.Max(maxX - minX+1, maxY - minY+1); // Note: I add 1 so that the maxX and maxY pixels are included, otherwise there is a cutoff
+
+            Bitmap centred = new Bitmap(cell.Width, cell.Height);
+            using (Graphics g = Graphics.FromImage(centred))
+            {
+                // Fill the new image with black
+                g.FillRectangle(new SolidBrush(System.Drawing.Color.Black), 0, 0, cell.Width, cell.Height);
+
+                System.Drawing.Rectangle destRect = new System.Drawing.Rectangle(border, border, centred.Width - border * 2, centred.Height - border * 2); // Destination rectangle that is a square with a border of the specified width
+                System.Drawing.Rectangle srcRect = new System.Drawing.Rectangle(centreX - maxOfWidthAndHeight / 2, centreY - maxOfWidthAndHeight / 2, maxOfWidthAndHeight, maxOfWidthAndHeight); // Rectangle on the source image that is the smallest square around the digit
+                g.DrawImage(cell, destRect, srcRect, GraphicsUnit.Pixel); // Copy across the image from the source rect to the dest rect
+            }
+
+            return centred;
+        }
+
+        /// <summary>
         /// Go back to the welcome page
         /// </summary>
         private void BtnBack_Click(object sender, RoutedEventArgs e)
@@ -268,8 +320,8 @@ namespace SudokuSolver
             NavigationService.GoBack();
         }
 
-            // NOT MY CODE, move to BitmapUtils
-            private Bitmap Invert(Bitmap image)
+        // NOT MY CODE, move to BitmapUtils
+        private Bitmap Invert(Bitmap image)
         {
             Bitmap result = new Bitmap(image);
             for (int y = 0; y <= (result.Height - 1); y++)
