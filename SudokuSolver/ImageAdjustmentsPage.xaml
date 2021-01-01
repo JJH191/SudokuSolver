@@ -16,15 +16,16 @@
     </Page.DataContext>
 
     <StackPanel>
-        <Canvas x:Name="canvas" 
+        <Canvas x:Name="CvsImage" 
                 Width="{Binding Image.Width, Mode=OneWay}" Height="{Binding Image.Height, Mode=OneWay}"
-                MouseMove="Canvas_MouseMoved" MouseDown="Canvas_MouseDown" MouseUp="Canvas_MouseUp">
+                MouseMove="CvsImage_MouseMoved" MouseDown="CvsImage_MouseDown" MouseUp="CvsImage_MouseUp">
             <Image Source="{Binding Image, Converter={StaticResource BitmapToBitmapImage}}" Width="{Binding Image.Width}" Height="{Binding Image.Height}"/>
         </Canvas>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,15,0,0">
-            <Slider Width="400" Height="25" Maximum="1" ValueChanged="Slider_ValueChanged" Value="{Binding Threshold}" LargeChange="0.1" VerticalAlignment="Center"/>
-            <Button Content="Next" Width="75" Height="25" Margin="15,0,0,0" VerticalAlignment="Center" Click="Btn_Next"/>
-            <Button Content="Estimate Corners" Width="120" Height="25" Margin="5,0,0,0" VerticalAlignment="Center" Click="Btn_EstimateCorners"/>
+            <Button Content="Back" Width="75" Height="25" Margin="0,0,15,0" VerticalAlignment="Center" Click="BtnBack_Click"/>
+            <Slider Width="400" Height="25" Maximum="1" ValueChanged="SldThreshold_ValueChanged" Value="{Binding Threshold}" LargeChange="0.1" VerticalAlignment="Center"/>
+            <Button Content="Next" Width="75" Height="25" Margin="15,0,0,0" VerticalAlignment="Center" Click="BtnNext_Click"/>
+            <Button Content="Estimate Corners" Width="120" Height="25" Margin="5,0,0,0" VerticalAlignment="Center" Click="BtnEstimateCorners_Click"/>
         </StackPanel>
     </StackPanel>
 </Page>

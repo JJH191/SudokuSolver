@@ -24,12 +24,13 @@
             <TextBlock Text="{Binding SuccessRate}"/>
             <TextBlock Text="%"/>
         </StackPanel>
-        <ListBox x:Name="LstReviewList" ItemsSource="{Binding List}"
+        <ListBox x:Name="LstReviewList" ItemsSource="{Binding Entries}"
                  BorderBrush="Transparent" 
                  Margin="0,10,0,0" 
                  Width="600" Height="600" 
                  ScrollViewer.CanContentScroll="false"
-                 MouseDoubleClick="ListBox_MouseDoubleClick">
+                 SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ReviewPage}}}"
+                 MouseDoubleClick="LstReviewList_MouseDoubleClick">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -42,6 +43,6 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Button HorizontalAlignment="Left" Margin="10,20,0,0" Width="100" Click="Btn_Back">Back</Button>
+        <Button HorizontalAlignment="Left" Margin="10,20,0,0" Width="100" Click="BtnBack_Click">Back</Button>
     </StackPanel>
 </Page>

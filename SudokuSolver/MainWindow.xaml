@@ -7,6 +7,6 @@
         mc:Ignorable="d"
         Title="Sudoku Solver" Height="450" Width="700" ResizeMode="CanMinimize" SizeToContent="WidthAndHeight">
     <Grid Margin="25">
-        <Frame x:Name="frame" NavigationUIVisibility="Hidden"/>
+        <Frame x:Name="FrmContent" NavigationUIVisibility="Hidden"/>
     </Grid>
 </Window>

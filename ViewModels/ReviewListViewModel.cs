@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Models;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ViewModels
@@ -8,33 +9,38 @@ namespace ViewModels
     /// </summary>
     public class ReviewListViewModel
     {
+        private readonly List<ReviewEntryModel> reviewEntries;
+
         // Contains all the entries
-        public List<ReviewEntryViewModel> List { get; private set; }
+        public List<ReviewEntryViewModel> Entries { 
+            get => reviewEntries.Select((entryModel) => new ReviewEntryViewModel(entryModel)).ToList(); // Convert ReviewEntryModel to ReviewEntryViewModel
+            private set => Entries = value;
+        }
 
         // Provides the success rate of the user
-        public float SuccessRate { get => List.Sum((entry) => entry.SolvedSuccessfully ? 1 : 0) * 100 / (float)List.Count; }
+        public float SuccessRate { get => reviewEntries.Sum((entry) => entry.WasSolvedSuccessfully() ? 1 : 0) / reviewEntries.Count * 100; }
 
         // TODO: Remove temporary code
         public ReviewListViewModel()
         {
-            List = new List<ReviewEntryViewModel> {
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel(),
-                new ReviewEntryViewModel()
+            reviewEntries = new List<ReviewEntryModel> {
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel(),
+                new ReviewEntryModel()
             };
         }
     }

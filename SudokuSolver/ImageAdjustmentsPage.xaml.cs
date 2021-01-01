@@ -48,7 +48,7 @@ namespace SudokuSolver
                 {
                     int index = j * 2 + i;
                     corners[index] = new Ellipse { Width = circleRadius * 2, Height = circleRadius * 2, Fill = new SolidColorBrush(new Colour(100, 255, 100, 200)) };
-                    canvas.Children.Add(corners[index]);
+                    CvsImage.Children.Add(corners[index]);
                 }
             }
 
@@ -138,7 +138,7 @@ namespace SudokuSolver
         }
 
         /// <summary>
-        /// Create the quad that is rendered on the canvas
+        /// Create the quad that is rendered on the CvsImage
         /// </summary>
         private void CreateQuad()
         {
@@ -152,19 +152,19 @@ namespace SudokuSolver
                 line.SetBinding(Line.X2Property, new Binding($"[{(i + 1) % quadViewModel.Length}].X") { Source = quadViewModel, Mode = BindingMode.OneWay });
                 line.SetBinding(Line.Y2Property, new Binding($"[{(i + 1) % quadViewModel.Length}].Y") { Source = quadViewModel, Mode = BindingMode.OneWay });
 
-                canvas.Children.Add(line);
+                CvsImage.Children.Add(line);
             }
         }
 
         /// <summary>
         /// Update the greyscale based on the new threshold
         /// </summary>
-        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void SldThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             viewModel.Greyscale();
         }
 
-        private void Btn_EstimateCorners(object sender, RoutedEventArgs e)
+        private void BtnEstimateCorners_Click(object sender, RoutedEventArgs e)
         {
             Vector2D[] corners = DetectCorners(viewModel.Image);// new Bitmap(viewModel.Image, new System.Drawing.Size((int)image.Width, (int)image.Height)));
             for (int i = 0; i < corners.Count(); i++)
@@ -174,25 +174,25 @@ namespace SudokuSolver
         /// <summary>
         /// Update the selected corner position to the mouse position
         /// </summary>
-        private void Canvas_MouseMoved(object sender, MouseEventArgs e)
+        private void CvsImage_MouseMoved(object sender, MouseEventArgs e)
         {
             // If there isn't a corner currently being dragged, return
             if (selected == -1) return;
-            System.Windows.Point mousePos = e.GetPosition(canvas);
+            System.Windows.Point mousePos = e.GetPosition(CvsImage);
 
             quadViewModel[selected] = new Vector2D(
-                Math.Max(Math.Min(mousePos.X, canvas.Width), 0),
-                Math.Max(Math.Min(mousePos.Y, canvas.Height), 0)
+                Math.Max(Math.Min(mousePos.X, CvsImage.Width), 0),
+                Math.Max(Math.Min(mousePos.Y, CvsImage.Height), 0)
             );
         }
 
         /// <summary>
         /// Loops through all the corners to see if the mouse is on them. If it is, it sets the currently selected corner to the one clicked on
         /// </summary>
-        private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
+        private void CvsImage_MouseDown(object sender, MouseButtonEventArgs e)
         {
             // Get the current mouse position
-            System.Windows.Point mousePos = e.GetPosition(canvas);
+            System.Windows.Point mousePos = e.GetPosition(CvsImage);
 
             // Loop through all the corners
             for (int i = 0; i < quadViewModel.Length; i++)
@@ -212,7 +212,7 @@ namespace SudokuSolver
         /// <summary>
         /// Reset selected corner
         /// </summary>
-        private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
+        private void CvsImage_MouseUp(object sender, MouseButtonEventArgs e)
         {
             // Reset selected so the corner will not continue to stick to the mouse
             selected = -1;
@@ -221,7 +221,7 @@ namespace SudokuSolver
         /// <summary>
         /// Go to the next page and pass the adjusted image
         /// </summary>
-        private void Btn_Next(object sender, RoutedEventArgs e)
+        private void BtnNext_Click(object sender, RoutedEventArgs e)
         {
             Bitmap adjustedImage = viewModel.GetAdjustedImage(quadViewModel);
             adjustedImage = Invert(RemoveBorders(adjustedImage)); // Remove the borders of the sudoku and invert the colours so the image works with the neural network
@@ -260,8 +260,16 @@ namespace SudokuSolver
             NavigationService.Navigate(new GridPage(sudoku));
         }
 
-        // NOT MY CODE, move to BitmapUtils
-        private Bitmap Invert(Bitmap image)
+        /// <summary>
+        /// Go back to the welcome page
+        /// </summary>
+        private void BtnBack_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.GoBack();
+        }
+
+            // NOT MY CODE, move to BitmapUtils
+            private Bitmap Invert(Bitmap image)
         {
             Bitmap result = new Bitmap(image);
             for (int y = 0; y <= (result.Height - 1); y++)

@@ -18,7 +18,7 @@ namespace SudokuSolver
         /// <summary>
         /// Prompt the user to select their sudoku image then navigate to the next page
         /// </summary>
-        private void Btn_Solve(object sender, RoutedEventArgs e)
+        private void BtnSolve_Click(object sender, RoutedEventArgs e)
         {
             // Prompt the user to select the sudoku image
             OpenFileDialog fileDialog = new OpenFileDialog { Filter = "Image (*.png, *.jpg)|*.png;*.jpg" };
@@ -30,9 +30,11 @@ namespace SudokuSolver
             NavigationService.Navigate(new ImageAdjustmentsPage(fileDialog.FileName));
         }
 
-        private void Btn_Review(object sender, RoutedEventArgs e)
+        private ReviewPage cachedReviewPage;
+        private void BtnReview_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new ReviewPage());
+            if (cachedReviewPage == null) cachedReviewPage = new ReviewPage();
+            NavigationService.Navigate(cachedReviewPage);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace SudokuSolver
             InitializeComponent();
 
             // Load the welcome page
-            frame.Navigate(new WelcomePage());
+            FrmContent.Navigate(new WelcomePage());
         }
     }
 }

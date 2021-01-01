@@ -14,7 +14,7 @@
             <Grid.Background>
                 <ImageBrush ImageSource="blank-sudoku-grid.png"/>
             </Grid.Background>
-            <Grid x:Name="grid" Margin="3">
+            <Grid x:Name="GrdSudokuGrid" Margin="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -45,9 +45,9 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Width="120" Height="20" Grid.Column="0" Click="BtnBack">Back</Button>
-            <Button Width="120" Height="20" Grid.Column="1"  Click="BtnSolveSudoku">Solve Sudoku</Button>
-            <Button Width="120" Height="20" Grid.Column="2"  Click="BtnClearSudoku">Clear Sudoku</Button>
+            <Button Width="120" Height="20" Grid.Column="0" Click="BtnBack_Click">Back</Button>
+            <Button Width="120" Height="20" Grid.Column="1"  Click="BtnSolveSudoku_Click">Solve Sudoku</Button>
+            <Button Width="120" Height="20" Grid.Column="2"  Click="BtnClearSudoku_Click">Clear Sudoku</Button>
         </Grid>
     </StackPanel>
 </Page>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models;
+using System;
 using System.Drawing;
 
 namespace ViewModels
@@ -8,18 +9,23 @@ namespace ViewModels
     /// </summary>
     public class ReviewEntryViewModel
     {
-        // TODO: Remove temporary code
-        private static readonly Random r = new Random();
+        private readonly ReviewEntryModel model;
 
-        public Bitmap Image { get; private set; }
-        public DateTime Date { get; private set; }
-        public bool SolvedSuccessfully { get; private set; }
-
-        public ReviewEntryViewModel()
+        public ReviewEntryViewModel(ReviewEntryModel model)
         {
-            Image = new Bitmap($@"C:\Users\Jacob\Downloads\sudoku{r.Next(2, 5)}.jpg");
-            Date = DateTime.Now.AddDays(-r.NextDouble() * 10000);
-            SolvedSuccessfully = r.NextDouble() > 0.5;
+            this.model = model;
         }
+
+        private Bitmap cachedImage;
+        public Bitmap Image { 
+            get
+            {
+                if (cachedImage == null) cachedImage = new Bitmap(model.ImagePath);
+                return cachedImage;
+            }
+        }
+
+        public DateTime Date { get => model.Date; }
+        public bool SolvedSuccessfully { get => model.WasSolvedSuccessfully();  }
     }
 }

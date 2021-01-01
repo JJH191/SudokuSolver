@@ -11,18 +11,19 @@ namespace SudokuSolver
     /// </summary>
     public partial class ReviewPage : Page
     {
+        public ReviewEntryViewModel SelectedItem { get; set; }
+
         public ReviewPage()
         {
             InitializeComponent();
         }
 
-        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void LstReviewList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            //MessageBox.Show(((ReviewEntryViewModel)LstReviewList.SelectedItem).Image.UriSource.LocalPath);
-            new ReviewEntryDetailsWindow((ReviewEntryViewModel)LstReviewList.SelectedItem).Show();
+            new ReviewEntryDetailsWindow(SelectedItem).Show(); 
         }
 
-        private void Btn_Back(object sender, RoutedEventArgs e)
+        private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.GoBack();
         }

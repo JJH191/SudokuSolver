@@ -23,7 +23,7 @@ namespace SudokuSolver
             {
                 for (int i = 0; i < 9; i++)
                 {
-                    grid.Children.Add(GetCell(i, j));
+                    GrdSudokuGrid.Children.Add(GetCell(i, j));
                 }
             }
         }
@@ -81,17 +81,17 @@ namespace SudokuSolver
         }
         #endregion
 
-        private void BtnSolveSudoku(object sender, RoutedEventArgs e)
+        private void BtnSolveSudoku_Click(object sender, RoutedEventArgs e)
         {
             sudokuGrid.Solve();
         }
 
-        private void BtnClearSudoku(object sender, RoutedEventArgs e)
+        private void BtnClearSudoku_Click(object sender, RoutedEventArgs e)
         {
             sudokuGrid.Clear();
         }
 
-        private void BtnBack(object sender, RoutedEventArgs e)
+        private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.GoBack();
         }
