@@ -54,8 +54,8 @@ namespace TrainingInterface
 
             Console.WriteLine("Training network");
 
-            emnist.Shuffle();
-            InputData[] data = emnist.GetData();
+            mnist.Shuffle();
+            InputData[] data = mnist.GetData();
             ProgressBar progressBar = new ProgressBar(data.Length, 75);
             for (int i = 0; i < data.Length; i++)
             {

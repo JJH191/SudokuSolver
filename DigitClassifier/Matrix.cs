@@ -1,262 +1,258 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace DigitClassifier
 {
     public class Matrix
     {
-        public readonly double[][] data;
+        private readonly double[][] data;
 
-        private Matrix(int rows, int cols)
+        #region Constructors
+        /// <summary>
+        /// Create a matrix with the specified number of <paramref name="rows"/> and <paramref name="cols"/>
+        /// </summary>
+        /// <param name="rows">The number of rows of the matrix</param>
+        /// <param name="cols">The number of columns of the matrix</param>
+        public Matrix(int rows, int cols)
         {
-            data = new double[rows][];
+            data = new double[rows][]; // Create a 2D array with the specified number of rows
 
-            for (var i = 0; i < rows; i++)
-            {
+            // Fill each index of the array with an array of length 'cols'
+            for (int i = 0; i < rows; i++)
                 data[i] = new double[cols];
-            }
         }
 
-        private Matrix(double[][] array)
+        /// <summary>
+        /// Create a matrix from a 2D array
+        /// </summary>
+        /// <param name="data">The data to fill the matrix with</param>
+        public Matrix(double[][] data)
         {
-            data = array;
+            this.data = data;
         }
 
-        private static double[][] CreateJagged(int rows, int cols)
+        /// <summary>
+        /// Create a matrix from a 1D array (a column <paramref name="vector"/>)
+        /// </summary>
+        /// <param name="vector">The column vector to create a matrix from</param>
+        public Matrix(double[] vector)
         {
-            var jagged = new double[rows][];
+            // Create a 2D array with 1 column and the same number of rows as the vector
+            data = new double[vector.Length][];
 
-            for (var i = 0; i < rows; i++)
+            for (int i = 0; i < vector.Length; i++)
+                data[i] = new double[] { vector[i] }; // Create an array with one element in it (from the vector)
+        }
+
+        /// <summary>
+        /// Create a deep copy of a matrix
+        /// </summary>
+        /// <param name="matrix">The matrix to copy</param>
+        public Matrix(Matrix matrix)
+        {
+            // Create a 2D array with the same number of rows
+            data = new double[matrix.data.Length][];
+
+            // Fill the data with the values from 'matrix'
+            for (int i = 0; i < matrix.data.Length; i++)
             {
-                jagged[i] = new double[cols];
-            }
-
-            return jagged;
-        }
-
-        public static Matrix Create(int rows, int cols)
-        {
-            return new Matrix(rows, cols);
-        }
-
-        public static Matrix Create(double[][] array)
-        {
-            return new Matrix(array);
-        }
-
-        public static Matrix Create(double[] arr)
-        {
-            var input = new double[arr.Length][];
-
-            for (var x = 0; x < input.Length; x++)
-            {
-                input[x] = new[] { arr[x] };
-            }
-
-            return Create(input);
-        }
-
-        public static Matrix CopyOf(Matrix m)
-        {
-            Matrix result = new Matrix(m.data.Length, m.data[0].Length);
-            for (int i = 0; i < m.data.Length; i++)
-            {
-                for (int j = 0; j < m.data[i].Length; j++)
+                for (int j = 0; j < matrix.data[i].Length; j++)
                 {
-                    result.data[i][j] = m.data[i][j];
+                    data[i][j] = matrix.data[i][j];
+                }
+            }
+        }
+        #endregion
+
+        #region Mathematical operations
+        /// <summary>
+        /// Adds <paramref name="matrix1"/> and <paramref name="matrix2"/> together
+        /// Each element in <paramref name="matrix1"/> is added to the corresponding value in <paramref name="matrix2"/>
+        /// </summary>
+        /// <param name="matrix1">First matrix</param>
+        /// <param name="matrix2">Second matrix</param>
+        /// <returns>A new matrix which is the sum of <paramref name="matrix1"/> and <paramref name="matrix2"/></returns>
+        public static Matrix operator +(Matrix matrix1, Matrix matrix2)
+        {
+            if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new Exception("Shape error - matrices do not have the same shape");
+            return Map(matrix1, (value, i, j) => value + matrix2.data[i][j]); // Loop through all the values in matrix1 and add the value of matrix2 at the same location
+        }
+
+        /// <summary>
+        /// Subtract <paramref name="matrix2"/> from <paramref name="matrix1"/>
+        /// Each element in <paramref name="matrix2"/> is subtracted from the corresponding value in <paramref name="matrix1"/>
+        /// </summary>
+        /// <param name="matrix1">The matrix to subtract from</param>
+        /// <param name="matrix2">The matrix that is subtracted</param>
+        /// <returns>A new matrix where each element in <paramref name="matrix2"/> is subtracted from <paramref name="matrix1"/></returns>
+        public static Matrix operator -(Matrix matrix1, Matrix matrix2)
+        {
+            if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new Exception("Shape error - matrices do not have the same shape");
+            return Map(matrix1, (value, i, j) => value - matrix2.data[i][j]); // Loop through all the values in matrix1 and subtract the value of matrix2 at the same location
+        }
+
+        /// <summary>
+        /// Scalar multiplication between <paramref name="matrix"/> and <paramref name="val"/>
+        /// Each element in the <paramref name="matrix"/> is multiplied by <paramref name="val"/>
+        /// </summary>
+        /// <param name="matrix">The matrix to multiply</param>
+        /// <param name="val">The value to multiply each element by</param>
+        /// <returns>A new matrix with all the elements multiplied by <paramref name="val"/></returns>
+        public static Matrix operator *(Matrix matrix, double val)
+        {
+            return Map(matrix, (value) => value * val); // Loop through all the values in matrix and multiply them by val
+        }
+
+        // TODO: Not my code
+        public static Matrix operator *(Matrix matrix1, Matrix matrix2)
+        {
+            if (matrix1.data[0].Length != matrix2.data.Length) throw new Exception("Shape error - left matrix columns should equal right matrix rows");
+
+            double[][] newData = new double[matrix1.data.Length][]; 
+
+            Parallel.For(0, matrix1.data.Length, i =>
+            {
+                newData[i] = new double[matrix2.data[0].Length];
+                for (int j = 0; j < matrix2.data[0].Length; j++)
+                {
+                    double sum = 0;
+
+                    for (int k = 0; k < matrix1.data[0].Length; k++)
+                        sum += matrix1.data[i][k] * matrix2.data[k][j];
+
+                    newData[i][j] = sum;
+                }
+            });
+
+            return new Matrix(newData);
+        }
+
+        /// <summary>
+        /// Multiplies all the elements in <paramref name="matrix1"/> by the corresponding value in <paramref name="matrix2"/>
+        /// </summary>
+        /// <param name="matrix1">First matrix</param>
+        /// <param name="matrix2">Second matrix</param>
+        /// <returns>A new matrix where each element is the product of the elements from <paramref name="matrix1"/> and <paramref name="matrix2"/></returns>
+        public static Matrix ScalarMultiply(Matrix matrix1, Matrix matrix2)
+        {
+            if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new Exception("Shape error - matrices do not have the same shape");
+
+            return Map(matrix1, (value, i, j) => value * matrix2.data[i][j]); // Loop through all the values in matrix1 and multiply by the value of matrix2 at the same location
+        }
+
+        /// <summary>
+        /// Get the transposition of this matrix
+        /// Transposing will swap the rows and columns of the matrix
+        /// </summary>
+        /// <returns>This matrix after being transposed</returns>
+        public Matrix GetTransposed()
+        {
+            Matrix transposed = new Matrix(data[0].Length, data.Length); // Create a new matrix with the rows and columns flipped
+
+            // Loop through all the values in col i and row j of this matrix
+            // and set col j and row i on the transposed matrix to that value
+            // (swapping the rows and columns)
+            for (int i = 0; i < data.Length; i++)
+            {
+                for (int j = 0; j < data[i].Length; j++)
+                {
+                    transposed.data[j][i] = data[i][j]; 
+                }
+            }
+
+            return transposed;
+        }
+        #endregion
+
+        #region Map
+        /// <summary>
+        /// Applies the function <paramref name="func"/> to each element in the matrix
+        /// </summary>
+        /// <param name="func">The function to apply to each element - taking in the current value and returning the new one</param>
+        public void Map(Func<double, double> func)
+        {
+            for (int i = 0; i < data.Length; i++)
+            {
+                for (int j = 0; j < data[i].Length; j++)
+                {
+                    data[i][j] = func(data[i][j]); // Apply the function to each element
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies the function <paramref name="func"/> to each element in the matrix
+        /// </summary>
+        /// <param name="func">The function to apply to each element - taking in the current value, and the position of that value, then returning the new value</param>
+        public void Map(Func<double, int, int, double> func)
+        {
+            for (int i = 0; i < data.Length; i++)
+            {
+                for (int j = 0; j < data[i].Length; j++)
+                {
+                    data[i][j] = func(data[i][j], i, j); // Apply the function to each element
+                }
+            }
+        }
+
+        // Static mapping
+
+        /// <summary>
+        /// Applies the function <paramref name="func"/> to each element in the matrix
+        /// </summary>
+        /// <param name="matrix">The matrix to apply <paramref name="func"/> to</param>
+        /// <param name="func">The function to apply to each element - taking in the current value and returning the new one</param>
+        /// <returns>A new matrix filled with the results of applying <paramref name="func"/> to the elements in <paramref name="matrix"/></returns>
+        public static Matrix Map(Matrix matrix, Func<double, double> func)
+        {
+            Matrix result = new Matrix(matrix.data.Length, matrix.data[0].Length);
+            for (int i = 0; i < result.data.Length; i++)
+            {
+                for (int j = 0; j < result.data[i].Length; j++)
+                {
+                    result.data[i][j] = func(matrix.data[i][j]); // Apply the function to each element
                 }
             }
 
             return result;
         }
 
-        public void Initialize(Func<double> elementInitializer)
+        /// <summary>
+        /// Applies the function <paramref name="func"/> to each element in the matrix
+        /// </summary>
+        /// <param name="matrix">The matrix to apply <paramref name="func"/> to</param>
+        /// <param name="func">The function to apply to each element - taking in the current value, and the position of that value, then returning the new value</param>
+        /// <returns>A new matrix filled with the results of applying <paramref name="func"/> to the elements in <paramref name="matrix"/></returns>
+        public static Matrix Map(Matrix matrix, Func<double, int, int, double> func)
         {
-            for (var x = 0; x < data.Length; x++)
+            Matrix result = new Matrix(matrix.data.Length, matrix.data[0].Length);
+            for (int i = 0; i < result.data.Length; i++)
             {
-                for (var y = 0; y < data[x].Length; y++)
+                for (int j = 0; j < result.data[i].Length; j++)
                 {
-                    data[x][y] = elementInitializer();
-                }
-            }
-        }
-
-        public static Matrix Map(Matrix matrix, Func<double, double> func)
-        {
-            Matrix m = CopyOf(matrix);
-            for (var x = 0; x < m.data.Length; x++)
-            {
-                for (var y = 0; y < m.data[x].Length; y++)
-                {
-                    m.data[x][y] = func(m.data[x][y]);
+                    result.data[i][j] = func(matrix.data[i][j], i, j); // Apply the function to each element
                 }
             }
 
-            return m;
+            return result;
         }
+        #endregion
 
-        public void Map(Func<double, double> func)
+        #region Serialising
+        /// <summary>
+        /// Write the data of this matrix to <paramref name="bw"/>
+        /// </summary>
+        /// <param name="bw">The destination for the data to be written to</param>
+        public void Serialise(BinaryWriter bw)
         {
-            for (var x = 0; x < data.Length; x++)
-            {
-                for (var y = 0; y < data[x].Length; y++)
-                {
-                    data[x][y] = func(data[x][y]);
-                }
-            }
-        }
+            bw.Write(data.Length); // Write the number of rows
+            bw.Write(data[0].Length); // Then the number of columns
 
-        public void MapWithIJ(Func<double, int, int, double> func)
-        {
-            for (var x = 0; x < data.Length; x++)
-            {
-                for (var y = 0; y < data[x].Length; y++)
-                {
-                    data[x][y] = func(data[x][y], x, y);
-                }
-            }
-        }
-
-        public double[][] Value => data;
-
-        public static Matrix operator -(Matrix a, Matrix b)
-        {
-            var newMatrix = CreateJagged(a.Value.Length, b.Value[0].Length);
-
-            for (var x = 0; x < a.Value.Length; x++)
-            {
-                for (var y = 0; y < a.Value[x].Length; y++)
-                {
-                    newMatrix[x][y] = a.Value[x][y] - b.Value[x][y];
-                }
-            }
-
-            return Create(newMatrix);
-        }
-
-        public static Matrix operator +(Matrix a, Matrix b)
-        {
-            var newMatrix = CreateJagged(a.Value.Length, b.Value[0].Length);
-
-            for (var x = 0; x < a.Value.Length; x++)
-            {
-                for (var y = 0; y < a.Value[x].Length; y++)
-                {
-                    newMatrix[x][y] = a.Value[x][y] + b.Value[x][y];
-                }
-            }
-
-            return Create(newMatrix);
-        }
-
-        public static Matrix operator +(Matrix a, double b)
-        {
-            for (var x = 0; x < a.Value.Length; x++)
-            {
-                for (var y = 0; y < a.Value[x].Length; y++)
-                {
-                    a.Value[x][y] = a.Value[x][y] + b;
-                }
-            }
-
-            return a;
-        }
-
-        public static Matrix operator -(double a, Matrix m)
-        {
-            for (var x = 0; x < m.Value.Length; x++)
-            {
-                for (var y = 0; y < m.Value[x].Length; y++)
-                {
-                    m.Value[x][y] = a - m.Value[x][y];
-                }
-            }
-
-            return m;
-        }
-
-        public static Matrix operator *(Matrix a, Matrix b)
-        {
-            if (a.Value.Length == b.Value.Length && a.Value[0].Length == b.Value[0].Length)
-            {
-                var m = CreateJagged(a.Value.Length, a.Value[0].Length);
-
-                Parallel.For(0, a.Value.Length, i =>
-                {
-                    //Parallel.For(0, a.Value[i].Length, j => m[i][j] = a.Value[i][j] * b.Value[i][j]);
-                    for (var j = 0; j < a.Value[i].Length; j++)
-                    {
-                        m[i][j] = a.Value[i][j] * b.Value[i][j];
-                    }
-                });
-
-                return Create(m);
-            }
-
-            var newMatrix = CreateJagged(a.Value.Length, b.Value[0].Length);
-
-            if (a.Value[0].Length == b.Value.Length)
-            {
-                var length = a.Value[0].Length;
-
-                Parallel.For(0, a.Value.Length, i =>
-                {
-                    for (var j = 0; j < b.Value[0].Length; j++)
-                    {
-                        var temp = 0.0;
-
-                        for (var k = 0; k < length; k++)
-                        {
-                            temp += a.Value[i][k] * b.Value[k][j];
-                        }
-
-                        newMatrix[i][j] = temp;
-                    }
-                });
-            }
-
-            return Create(newMatrix);
-        }
-
-        public static Matrix operator *(double scalar, Matrix b)
-        {
-            var newMatrix = CreateJagged(b.Value.Length, b.Value[0].Length);
-
-            for (var x = 0; x < b.Value.Length; x++)
-            {
-                for (var y = 0; y < b.Value[x].Length; y++)
-                {
-                    newMatrix[x][y] = b.Value[x][y] * scalar;
-                }
-            }
-
-            return Create(newMatrix);
-        }
-
-        public Matrix Transpose()
-        {
-            var rows = data.Length;
-
-            var newMatrix = CreateJagged(data[0].Length, rows); //rows --> cols, cols --> rows
-
-            for (var row = 0; row < rows; row++)
-            {
-                for (var col = 0; col < data[row].Length; col++)
-                {
-                    newMatrix[col][row] = data[row][col];
-                }
-            }
-
-            return Create(newMatrix);
-        }
-
-        public void Serialize(BinaryWriter bw)
-        {
-            bw.Write(data.Length);
-            bw.Write(data[0].Length);
-
+            // Then write each element of data
             for (int i = 0; i < data.Length; i++)
             {
                 for (int j = 0; j < data[0].Length; j++)
@@ -266,27 +262,35 @@ namespace DigitClassifier
             }
         }
 
-        public static Matrix Deserialize(BinaryReader br)
+        /// <summary>
+        /// Reads the data from <paramref name="br"/> and creates a new matrix
+        /// </summary>
+        /// <param name="br">The source of data to read from</param>
+        /// <returns>A new matrix with the data from the binary reader</returns>
+        public static Matrix Deserialise(BinaryReader br)
         {
-            int length0 = br.ReadInt32();
-            int length1 = br.ReadInt32();
+            // Read in the number of rows and columns
+            int rows = br.ReadInt32();
+            int cols = br.ReadInt32();
 
-            double[][] data = new double[length0][];
-            for (int i = 0; i < length0; i++)
+            // Create a new 2D data array, then loop through the rows and columns, reading in the values to fill the array with
+            double[][] data = new double[rows][];
+            for (int i = 0; i < rows; i++)
             {
-                for (int j = 0; j < length1; j++)
+                for (int j = 0; j < cols; j++)
                 {
-                    if (j == 0) data[i] = new double[length1];
+                    if (j == 0) data[i] = new double[cols]; // TODO: Try moving this line outside the j for loop so no if statements are needed
                     data[i][j] = br.ReadDouble();
                 }
             }
 
             return new Matrix(data);
         }
+        #endregion
 
+        // TODO: Not my code
         public double[] ToArray()
         {
-            //if (_matrix.Length != 1) throw new Exception("Matrix must only have one column.");
             return data.SelectMany(x => x.Select(y => y)).ToArray();
         }
     }

@@ -17,13 +17,13 @@ namespace DigitClassifier
         public static NeuralNetwork CreateNewNeuralNetwork(Layer[] layers, double learningRate)
         {
             NeuralNetwork network = new NeuralNetwork(layers, learningRate);
-            network.RandomizeWeights();
+            network.Randomise();
             return network;
         }
 
-        private void RandomizeWeights()
+        private void Randomise()
         {
-            foreach (Layer l in layers) l.Randomise();
+            foreach (Layer layer in layers) layer.Randomise();
         }
 
         public void Train(double[] inputs, double[] targets)
@@ -47,13 +47,13 @@ namespace DigitClassifier
 
         public double[] Query(double[] inputs)
         {
-            double[][] outputs = new double[layers.Length + 1][];
-            outputs[0] = inputs;
+            double[][] values = new double[layers.Length + 1][];
+            values[0] = inputs;
 
             for (int i = 0; i < layers.Length; i++)
-                outputs[i + 1] = layers[i].FeedForward(outputs[i]);
+                values[i + 1] = layers[i].FeedForward(values[i]);
 
-            return outputs.Last();
+            return values.Last();
         }
 
         public void Save(string filepath)
@@ -63,10 +63,10 @@ namespace DigitClassifier
 
             bw.Write(learningRate);
             bw.Write(layers.Length);
+
             foreach (Layer layer in layers)
-            {
-                layer.Serialize(bw);
-            }
+                layer.Serialise(bw);
+
             fs.Close();
         }
 
@@ -79,11 +79,13 @@ namespace DigitClassifier
 
             int noOfLayers = br.ReadInt32();
             Layer[] layers = new Layer[noOfLayers];
+
             for (int i = 0; i < noOfLayers; i++)
             {
                 if (fs.Length == 0) break;
-                layers[i] = Layer.Deserialize(br);
+                layers[i] = Layer.Deserialise(br);
             }
+
             fs.Close();
 
             return new NeuralNetwork(layers.ToArray(), learningRate);
