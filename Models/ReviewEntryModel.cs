@@ -20,7 +20,7 @@ namespace Models
         }
 
         // TODO: Return locations of errors 
-        public List<Vector2I> GetErrors() => new List<Vector2I>();
+        public List<Vector2I> GetErrors() => sudokuGrid.GetErrors();
 
         public bool WasSolvedSuccessfully() => true;// sudokuGrid.IsValid(); 
     }

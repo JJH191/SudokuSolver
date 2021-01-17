@@ -1,4 +1,6 @@
-﻿using System;
+﻿using HelperClasses;
+using System;
+using System.Collections.Generic;
 
 namespace Models
 {
@@ -8,7 +10,7 @@ namespace Models
     public class SudokuGridModel
     {
         // The contents of the sudoku grid
-        public int[,] Data { get; private set; }
+        public CellModel[,] Data { get; private set; }
 
         /// <summary>
         /// Create a new sudoku grid with the provided <paramref name="data"/>
@@ -16,7 +18,14 @@ namespace Models
         /// <param name="data">Data to fill the sudoku grid with</param>
         public SudokuGridModel(int[,] data)
         {
-            Data = data;
+            Data = new CellModel[9, 9];
+            for (int j = 0; j < data.GetLength(1); j++)
+            {
+                for (int i = 0; i < data.GetLength(0); i++)
+                {
+                    Data[i, j] = new CellModel(data[i, j]);
+                }
+            }
         }
 
         /// <summary>
@@ -28,7 +37,8 @@ namespace Models
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    Data[i, j] = -1;
+                    Data[i, j].Number = -1;
+                    Data[i, j].IsValid = true;
                 }
             }
         }
@@ -41,7 +51,7 @@ namespace Models
         {
             if (!IsValid()) return false; // If the board is invalid to begin with, the solve was unsuccessful
 
-            int[,] solvedGrid = (int[,])Data.Clone(); // Copy the grid so that it can be reset if the solve was unsuccessful
+            CellModel[,] solvedGrid = (CellModel[,])Data.Clone(); // Copy the grid so that it can be reset if the solve was unsuccessful
             if (SolveSudokuHelper(ref solvedGrid)) // Call the recursive solving function
             {
                 Data = solvedGrid; // Set the data to be the new solved grid
@@ -61,7 +71,7 @@ namespace Models
         /// </summary>
         /// <param name="grid">The grid to solve</param>
         /// <returns>Whether it was solvable</returns>
-        private bool SolveSudokuHelper(ref int[,] grid)
+        private bool SolveSudokuHelper(ref CellModel[,] grid)
         {
             // Loop through all the cells
             for (int j = 0; j < 9; j++)
@@ -69,7 +79,7 @@ namespace Models
                 for (int i = 0; i < 9; i++)
                 {
                     // If the cell is empty
-                    if (grid[i, j] == -1)
+                    if (grid[i, j].Number == -1)
                     {
                         // Try all the numbers from 1 to 9 in the cell
                         for (int n = 1; n < 10; n++)
@@ -78,10 +88,10 @@ namespace Models
                             if (IsNumberValid(grid, n, i, j))
                             {
                                 // If it is valid, set the cell to the new number and try solving the rest
-                                grid[i, j] = n;
+                                grid[i, j].Number = n;
 
                                 // If the rest could not be solved, set the cell back to empty
-                                if (!SolveSudokuHelper(ref grid)) grid[i, j] = -1;
+                                if (!SolveSudokuHelper(ref grid)) grid[i, j].Number = -1;
                                 // If the rest could be solved, and the grid is now complete, the sudoku is solved, so return true
                                 else if (IsFull(grid)) return true;
                             }
@@ -103,19 +113,24 @@ namespace Models
         /// </summary>
         /// <param name="sudoku">Sudoku grid to check if it's full</param>
         /// <returns>True if grid is full, false if not</returns>
-        private bool IsFull(int[,] sudoku)
+        private bool IsFull(CellModel[,] sudoku)
         {
             // Loop through all the cells, if any is empty, the grid is not full so return false
             for (int i = 0; i < sudoku.GetLength(0); i++)
             {
                 for (int j = 0; j < sudoku.GetLength(1); j++)
                 {
-                    if (sudoku[i, j] == -1) return false;
+                    if (sudoku[i, j].Number == -1) return false;
                 }
             }
 
             // No cell was empty, so the grid is full
             return true;
+        }
+
+        public bool IsFull()
+        {
+            return IsFull(Data);
         }
 
         /// <summary>
@@ -126,15 +141,15 @@ namespace Models
         /// <param name="x">The x position of the cell to insert the number into</param>
         /// <param name="y">The y position of the cell to insert the number into</param>
         /// <returns>True if the number is valid in the given position, false otherwise</returns>
-        private bool IsNumberValid(int[,] sudoku, int number, int x, int y)
+        private bool IsNumberValid(CellModel[,] sudoku, int number, int x, int y)
         {
             // Check rows
             for (int i = 0; i < 9; i++)
-                if (i != x && sudoku[i, y] != -1 && sudoku[i, y] == number) return false; // If the number matches any other number in the row, the number is not valid - return false
+                if (i != x && sudoku[i, y].Number != -1 && sudoku[i, y].Number == number) return false; // If the number matches any other number in the row, the number is not valid - return false
 
             // Check columns
             for (int i = 0; i < 9; i++)
-                if (i != y && sudoku[x, i] != -1 && sudoku[x, i] == number) return false; // If the number matches any other number in the column, the number is not valid - return false
+                if (i != y && sudoku[x, i].Number != -1 && sudoku[x, i].Number == number) return false; // If the number matches any other number in the column, the number is not valid - return false
 
             // Check 3x3 groups of cells (We only need to check the four corners as the others are covered by checking the rows and columns
             int groupTop = (int)Math.Floor(y / 3f) * 3; // Get the position of the top of the 3x3 grid containing the cell (x, y)
@@ -144,8 +159,8 @@ namespace Models
                 int groupLeft = (int)Math.Floor(x / 3f) * 3; // Get the position of the left of the 3x3 grid containing the cell (x, y)
                 for (int i = groupLeft; i < groupLeft + 3; i++) // Loop through all x values within the 3x3 group
                 {
-                    if (i == x || sudoku[i, j] == -1) continue; // Skip if we are checking against the same x value (this has already been checked by column checks)
-                    if (sudoku[i, j] == number) return false; // If the number matches any other number in the group, the number is not valid - return false
+                    if (i == x || sudoku[i, j].Number == -1) continue; // Skip if we are checking against the same x value (this has already been checked by column checks)
+                    if (sudoku[i, j].Number == number) return false; // If the number matches any other number in the group, the number is not valid - return false
                 }
             }
 
@@ -164,12 +179,33 @@ namespace Models
             {
                 for (int i = 0; i < 9; i++)
                 {
-                    if (!IsNumberValid(Data, Data[i, j], i, j)) return false;
+                    if (!IsNumberValid(Data, Data[i, j].Number, i, j)) return false;
                 }
             }
 
             // No cells were invalid
             return true;
+        }
+
+        public List<Vector2I> GetErrors()
+        {
+            List<Vector2I> errors = new List<Vector2I>();
+        
+            // Loop through all the cells and see if the number in that cell is valid
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    if (!IsNumberValid(Data, Data[i, j].Number, i, j)) errors.Add(new Vector2I(i, j));
+                }
+            }
+        
+            return errors;
+        }
+
+        public bool IsCellValid(int i, int j)
+        {
+            return IsNumberValid(Data, Data[i, j].Number, i, j);
         }
     }
 }

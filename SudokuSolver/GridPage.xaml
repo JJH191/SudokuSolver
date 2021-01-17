@@ -1,13 +1,13 @@
-﻿<Page x:Class="SudokuSolver.GridPage"
+﻿<Page
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:SudokuSolver"
+      xmlns:Converters="clr-namespace:ViewModels.Converters;assembly=ViewModels" x:Class="SudokuSolver.GridPage"
       mc:Ignorable="d" 
       d:DesignHeight="650" d:DesignWidth="550"
       Title="GridPage">
-
 
     <StackPanel>
         <Grid Height="550" Width="550">
@@ -45,9 +45,9 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Width="120" Height="20" Grid.Column="0" Click="BtnBack_Click">Back</Button>
-            <Button Width="120" Height="20" Grid.Column="1"  Click="BtnSolveSudoku_Click">Solve Sudoku</Button>
-            <Button Width="120" Height="20" Grid.Column="2"  Click="BtnClearSudoku_Click">Clear Sudoku</Button>
+            <Button Width="120" Height="20" Grid.Column="0" Click="BtnBack_Click" Content="Back"/>
+            <Button Width="120" Height="20" Grid.Column="1" Click="BtnSolveSudoku_Click" Content="{Binding SolveOrCheck, Mode=OneWay}" IsEnabled="{Binding IsCheckButtonEnabled}"/>
+            <Button Width="120" Height="20" Grid.Column="2" Click="BtnClearSudoku_Click" Content="Clear"/>
         </Grid>
     </StackPanel>
 </Page>

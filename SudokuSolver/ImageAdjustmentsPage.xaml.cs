@@ -31,7 +31,7 @@ namespace SudokuSolver
         public ImageAdjustmentsPage(string sudokuPath)
         {
             InitializeComponent();
-            viewModel = ((SudokuImageViewModel)DataContext);
+            viewModel = (SudokuImageViewModel)DataContext;
 
             viewModel.Image = new Bitmap(sudokuPath);
             viewModel.Threshold = 0.6;
@@ -229,7 +229,7 @@ namespace SudokuSolver
             float cellSize = adjustedImage.Width / 9f; // Get the size of an individual cell
 
             int[,] sudoku = new int[9, 9];
-            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("trained_network.nn"); // Create the classifier from the saved model
+            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("neural_network.nn"); // Create the classifier from the saved model
 
             for (int j = 0; j < 9; j++)
             {

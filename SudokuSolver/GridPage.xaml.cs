@@ -1,9 +1,14 @@
-﻿using System.Text.RegularExpressions;
+﻿using HelperClasses;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using ViewModels;
+using ViewModels.Converters;
 
 namespace SudokuSolver
 {
@@ -12,11 +17,14 @@ namespace SudokuSolver
     /// </summary>
     public partial class GridPage : Page
     {
-        public SudokuGridViewModel sudokuGrid;// = new SudokuGridViewModel();
+        //private readonly CellViewModel[,] cells = new CellViewModel[9,9];
+        private readonly SudokuGridViewModel sudokuGrid;
 
         public GridPage(int[,] sudoku)
         {
             sudokuGrid = new SudokuGridViewModel(sudoku);
+            DataContext = sudokuGrid;
+            
             InitializeComponent();
 
             for (int j = 0; j < 9; j++)
@@ -29,49 +37,31 @@ namespace SudokuSolver
         }
 
         #region Generating Grid
-        TextBox GetCell(int i, int j)
+        UIElement GetCell(int i, int j)
         {
-            TextBox tb = new TextBox();
-            tb.SetBinding(TextBox.TextProperty, GetBindingForCell(i, j)); // Set binding
-            SetGridPosition(tb, i, j); // Set grid position
+            Grid grid = new Grid();
+            grid.SetBinding(BackgroundProperty, new Binding("Colour") { Source = sudokuGrid[i, j], Converter = new ColourToSolidColourBrush() });
+
+            SetGridPosition(grid, i, j); // Set grid position
+
+            TextBox textBox = new TextBox();
+            textBox.SetBinding(TextBox.TextProperty, new Binding("Number") { Source = sudokuGrid[i, j], Converter = new IntToCellString(), UpdateSourceTrigger=UpdateSourceTrigger.PropertyChanged });
+            grid.Children.Add(textBox);
 
             // Make transparent
-            tb.Background = new SolidColorBrush(Colors.Transparent);
-            tb.BorderThickness = new Thickness(0);
+            textBox.Background = new SolidColorBrush(Colors.Transparent);
+            VerticalAlignment = VerticalAlignment.Stretch;
+            textBox.BorderThickness = new Thickness(0);
 
             // Align text to center
-            tb.HorizontalAlignment = HorizontalAlignment.Stretch;
-            tb.VerticalAlignment = VerticalAlignment.Center;
-            tb.TextAlignment = TextAlignment.Center;
+            textBox.HorizontalAlignment = HorizontalAlignment.Stretch;
+            textBox.VerticalAlignment = VerticalAlignment.Center;
+            textBox.TextAlignment = TextAlignment.Center;
 
             // Text size
-            tb.FontSize = 20;
+            textBox.FontSize = 20;
 
-            tb.TextChanged += ValidateInput;
-
-            return tb;
-        }
-
-        private static readonly Regex numberRegex = new Regex("[1-9]+");
-        private void ValidateInput(object sender, TextChangedEventArgs e)
-        {
-            TextBox textBox = (TextBox)sender;
-
-            // If user has tried to input more than 1 character, remove it and set cursor position back
-            if (textBox.Text.Length > 0)
-            {
-                textBox.Text = textBox.Text.Substring(0, 1);
-                textBox.CaretIndex = 1;
-            }
-
-            // If the user has tried to input anything but a number, don't allow it
-            if (!numberRegex.IsMatch(textBox.Text)) textBox.Text = "";
-        }
-
-        BindingBase GetBindingForCell(int i, int j)
-        {
-            string binding = $"[{SudokuGridViewModel.GetStringIndex(i, j)}]";
-            return new Binding(binding) { Source = sudokuGrid };
+            return grid;
         }
 
         private void SetGridPosition(UIElement elem, int i, int j)
@@ -83,7 +73,27 @@ namespace SudokuSolver
 
         private void BtnSolveSudoku_Click(object sender, RoutedEventArgs e)
         {
-            sudokuGrid.Solve();
+
+            if (!sudokuGrid.IsFull()) // Solve
+            {
+                if (!sudokuGrid.Solve())
+                {
+                    MessageBox.Show("Could not solve the sudoku.\nThis is most likely because one or more numbers are incorrect.", "Error solving");
+                }
+            }
+            else // Check or save
+            {
+                if (!sudokuGrid.IsButtonShowingSave) sudokuGrid.DisplayErrors(); // Check
+                else // Save
+                {
+                    // TODO: Save
+                    MessageBox.Show("Sudoku saved!", "Saved");
+
+                    // Go back to main menu
+                    NavigationService.GoBack();
+                    NavigationService.GoBack();
+                }
+            }
         }
 
         private void BtnClearSudoku_Click(object sender, RoutedEventArgs e)

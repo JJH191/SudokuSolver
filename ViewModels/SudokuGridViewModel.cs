@@ -1,18 +1,54 @@
-﻿using Models;
+﻿using HelperClasses;
+using Models;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace ViewModels
 {
     /// <summary>
-    /// View model to provide the data for the quad that marks the outline of the sudoku
+    /// View model to provide the data for the contents of the sudoku
     /// </summary>
-    // Not my code
     public class SudokuGridViewModel : INotifyPropertyChanged
     {
         private readonly SudokuGridModel sudokuGrid;
+        private readonly CellViewModel[,] cells = new CellViewModel[9, 9];
+        private bool displayingErrors = false;
+
+        private bool hasClickedSolve = false;
+        public bool IsButtonShowingSave { get; private set; } = false;
+
+        private string solveOrCheck;
+        public string SolveOrCheck
+        {
+            get => solveOrCheck;
+            private set
+            {
+                IsButtonShowingSave = value.ToLower() == "save";
+
+                solveOrCheck = value;
+                Notify(nameof(SolveOrCheck));
+            }
+        }
+
+        public bool IsCheckButtonEnabled
+        {
+            get => !hasClickedSolve;
+        }
+
+        public void HandleCellNumberChanged()
+        {
+            hasClickedSolve = false;
+            ClearErrors();
+
+            //if (sudokuGrid.IsFull()) SolveOrCheck = "Check";
+            //else SolveOrCheck = "Solve";
+            SolveOrCheck = sudokuGrid.IsFull() ? "Check" : "Solve";
+            Notify(nameof(IsCheckButtonEnabled));
+        }
 
         /// <summary>
         /// Create a new sudoku grid model with the provided <paramref name="grid"/>
@@ -21,94 +57,99 @@ namespace ViewModels
         public SudokuGridViewModel(int[,] grid)
         {
             sudokuGrid = new SudokuGridModel(grid);
-        }
+            SolveOrCheck = "Check";
 
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    sudokuGrid.Data[i, j].CellNumberModifiedEvent += HandleCellNumberChanged;
+                    cells[i, j] = new CellViewModel(sudokuGrid.Data[i, j]);
+                    if (cells[i, j].Number == -1) SolveOrCheck = "Solve";
+                }
+            }
+
+        }
+    
         /// <summary>
         /// Handles solving of the sudoku
         /// </summary>
-        public void Solve()
+        /// <returns>Whether the sudoku was solved successfully</returns>
+        public bool Solve()
         {
             // TODO: Response to success/fail
-            if (!sudokuGrid.Solve()) Debug.WriteLine("Did not solve");
-            else Notify(Binding.IndexerName);
+            if (!sudokuGrid.Solve()) return false;
+            else
+            {
+                UpdateCellsUI();
+                hasClickedSolve = true;
+                Notify(nameof(IsCheckButtonEnabled));
+                return true;
+            }
         }
 
+        private void UpdateCellsUI()
+        {
+            foreach (CellViewModel cell in cells) cell.NotifyChange();
+        }
+
+        public void DisplayErrors()
+        {
+            displayingErrors = true;
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    cells[i, j].SetIsValid(sudokuGrid.IsCellValid(i, j));
+                    cells[i, j].NotifyChange();
+                }
+            }
+
+            SolveOrCheck = "Save";
+        }
+
+        public void ClearErrors()
+        {
+            if (!displayingErrors) return;
+
+            displayingErrors = false;
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    cells[i, j].SetIsValid(true);
+                    cells[i, j].NotifyChange(number: false);
+                }
+            }
+        }
+
+        public bool IsFull()
+        {
+            return sudokuGrid.IsFull();
+        }
+    
         /// <summary>
         /// Clears the sudoku grid
         /// </summary>
         public void Clear()
         {
             sudokuGrid.Clear();
-            Notify(Binding.IndexerName);
+            UpdateCellsUI();
         }
-
-        /// <summary>
-        /// Splits a string index into two integers
-        /// </summary>
-        /// <param name="index">The string index</param>
-        /// <param name="i">The first index of the cell</param>
-        /// <param name="j">The second index of the cell</param>
-        private void SplitIndex(string index, out int i, out int j)
-        {
-            string[] ij = index.Split('-'); // Split the index into i and j
-            if (ij.Length != 2) throw new ArgumentException("Invalid index"); // Should have two parts
-
-            // Convert strings to integers
-            i = int.Parse(ij[0]);
-            j = int.Parse(ij[1]);
-        }
-
-        /// <summary>
-        /// Get the string equivalent for an index - helps with binding in WPF
-        /// </summary>
-        /// <param name="i">First index</param>
-        /// <param name="j">Second index</param>
-        /// <returns></returns>
-        public static string GetStringIndex(int i, int j)
-        {
-            return i.ToString() + "-" + j.ToString();
-        }
-
-        #region Array Methods
+    
         /// <summary>
         /// Access a cell in the sudoku grid at a given <paramref name="index"/>
         /// </summary>
         /// <param name="index">The index of the cell in the format from <see cref="GetStringIndex(int, int)"/></param>
         /// <returns></returns>
-        public string this[string index]
+        public CellViewModel this[int i, int j]
         {
             get
             {
-                SplitIndex(index, out int i, out int j);
-                if (sudokuGrid.Data[i, j] == -1) return "";
-                return sudokuGrid.Data[i, j].ToString();
-            }
-            set
-            {
-                SplitIndex(index, out int i, out int j);
-                if (value.Trim().Length == 0) sudokuGrid.Data[i, j] = -1;
-                else sudokuGrid.Data[i, j] = int.Parse(value);
-                Notify(Binding.IndexerName);
+                return cells[i, j];
             }
         }
-
-        /// <summary>
-        /// Access a cell in the sudoku grid at the index [<paramref name="i"/>, <paramref name="j"/>]
-        /// </summary>
-        /// <param name="i">The first index of the cell</param>
-        /// <param name="j">The second index of the cell</param>
-        /// <returns></returns>
-        public int this[int i, int j]
-        {
-            get => sudokuGrid.Data[i, j]; // Get the cell
-            set
-            {
-                sudokuGrid.Data[i, j] = value; // Set the value
-                Notify(Binding.IndexerName); // Notify the UI of a change
-            }
-        }
-        #endregion
-
+    
         // Notifier for when a property changes
         public event PropertyChangedEventHandler PropertyChanged;
         private void Notify(string property)
