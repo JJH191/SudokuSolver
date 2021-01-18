@@ -227,7 +227,6 @@ namespace SudokuSolver
         {
             Bitmap adjustedImage = viewModel.GetAdjustedImage(quadViewModel);
             adjustedImage = Invert(RemoveBorders(adjustedImage)); // Remove the borders of the sudoku and invert the colours so the image works with the neural network
-            adjustedImage.Save("CleanedImage.png"); // TODO: saving for debugging purposes
             float cellSize = adjustedImage.Width / 9f; // Get the size of an individual cell
 
             int[,] sudoku = new int[9, 9];
@@ -249,7 +248,6 @@ namespace SudokuSolver
                     else
                     {
                         cell = CentreDigit(cell); // Centre the digit in the cell so it is more similar to the training data
-                        cell.Save($"{i + 1},{j + 1}.png");
 
                         // Classify the digit
                         int classifiedDigit = classifier.GetDigit(cell);

@@ -1,4 +1,8 @@
 ﻿using Database;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -84,8 +88,7 @@ namespace SudokuSolver
                 if (!sudokuGrid.IsButtonShowingSave) sudokuGrid.DisplayErrors(); // Check
                 else // Save
                 {
-                    // TODO: Save
-                    SqliteDataAccess.Save(sudokuGrid.GetModel(), imagePath);
+                    SqliteDataAccess.Save(sudokuGrid.GetModel(), SaveCopyOfImage(imagePath));
                     MessageBox.Show("Sudoku saved!", "Saved");
 
                     // Go back to main menu
@@ -93,6 +96,33 @@ namespace SudokuSolver
                     NavigationService.GoBack();
                 }
             }
+        }
+
+        private string SaveCopyOfImage(string imagePath)
+        {
+            string newPath = $"./images/{GetNextImageIndex("./images")}.png";
+            new Bitmap(imagePath).Save(newPath);
+            return newPath;
+        }
+
+        private int GetNextImageIndex(string directory)
+        {
+            int mostRecent = Directory.GetFiles(directory).Select((file) =>
+            {
+                if (!int.TryParse(GetFileNameWithoutExtension(file), out int fileNumber)) return int.MinValue;
+                return fileNumber;
+            }).OrderByDescending(number => number).FirstOrDefault();
+
+            return mostRecent + 1;
+        }
+
+        private string GetFileNameWithoutExtension(string file)
+        {
+            int start = file.Replace('/', '\\').LastIndexOf("\\") + 1;
+            int end = file.LastIndexOf(".");
+            int fileLength = file.Length;
+            string result = file.Substring(start, end - start);
+            return result;
         }
 
         private void BtnClearSudoku_Click(object sender, RoutedEventArgs e)
