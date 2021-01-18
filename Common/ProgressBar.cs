@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TrainingInterface
+namespace Common
 {
     /// <summary>
     /// A simple ascii progress bar for the console

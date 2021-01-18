@@ -1,4 +1,4 @@
-﻿using HelperClasses;
+﻿using Common;
 using System;
 using System.Collections.Generic;
 
@@ -7,21 +7,21 @@ namespace Models
     public class ReviewEntryModel
     {
         // TODO: Remove temporary code
-        private static readonly Random r = new Random();
+        //private static readonly Random r = new Random();
 
         public string ImagePath { get; private set; }
         public DateTime Date { get; private set; }
-        private readonly SudokuGridModel sudokuGrid;
+        public SudokuGridModel SudokuGrid { get; set; }
 
-        public ReviewEntryModel()
+        public ReviewEntryModel(string imagePath, DateTime date)
         {
-            ImagePath = $@"C:\Users\Jacob\Downloads\sudoku{r.Next(2, 5)}.jpg";
-            Date = DateTime.Now.AddDays(-r.NextDouble() * 10000);
+            ImagePath = imagePath;
+            Date = date;
         }
 
         // TODO: Return locations of errors 
-        public List<Vector2I> GetErrors() => sudokuGrid.GetErrors();
+        //public List<Vector2I> GetErrors() => SudokuGrid.GetErrors();
 
-        public bool WasSolvedSuccessfully() => true;// sudokuGrid.IsValid(); 
+        public bool WasSolvedSuccessfully() => SudokuGrid.IsValid();
     }
 }

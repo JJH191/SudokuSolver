@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Database;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
@@ -12,10 +13,14 @@ namespace SudokuSolver
     public partial class ReviewPage : Page
     {
         public ReviewEntryViewModel SelectedItem { get; set; }
+        private readonly ReviewListViewModel reviewEntries;
 
         public ReviewPage()
         {
             InitializeComponent();
+
+            reviewEntries = new ReviewListViewModel(SqliteDataAccess.GetReviewEntries());
+            DataContext = reviewEntries;
         }
 
         private void LstReviewList_MouseDoubleClick(object sender, MouseButtonEventArgs e)

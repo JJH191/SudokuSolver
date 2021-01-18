@@ -1,4 +1,5 @@
-﻿using DigitClassifier;
+﻿using Common;
+using DigitClassifier;
 using DigitClassifier.Activation_Functions;
 using System;
 using System.Drawing;

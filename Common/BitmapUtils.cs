@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Media;
 
-namespace HelperClasses
+namespace Common
 {
     /// <summary>
     /// A set of utility functions for bitmap

@@ -1,4 +1,4 @@
-﻿using HelperClasses;
+﻿using Common;
 using Models;
 using System;
 using System.Collections.Generic;
@@ -149,6 +149,8 @@ namespace ViewModels
                 return cells[i, j];
             }
         }
+
+        public SudokuGridModel GetModel() => sudokuGrid;
     
         // Notifier for when a property changes
         public event PropertyChangedEventHandler PropertyChanged;

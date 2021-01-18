@@ -99,14 +99,14 @@
     <Compile Include="SudokuImageModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HelperClasses\HelperClasses.csproj">
-      <Project>{8ebe359a-fc81-405a-939a-0424d45ff4a3}</Project>
-      <Name>HelperClasses</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{8ebe359a-fc81-405a-939a-0424d45ff4a3}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Accord.3.8.0\build\Accord.targets" Condition="Exists('..\packages\Accord.3.8.0\build\Accord.targets')" />

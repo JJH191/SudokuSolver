@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Database;
+using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -13,6 +14,7 @@ namespace SudokuSolver
         public WelcomePage()
         {
             InitializeComponent();
+            SqliteDataAccess.GetReviewEntries();
         }
 
         /// <summary>
@@ -33,7 +35,7 @@ namespace SudokuSolver
         private ReviewPage cachedReviewPage;
         private void BtnReview_Click(object sender, RoutedEventArgs e)
         {
-            if (cachedReviewPage == null) cachedReviewPage = new ReviewPage();
+            /*if (cachedReviewPage == null)*/ cachedReviewPage = new ReviewPage();
             NavigationService.Navigate(cachedReviewPage);
         }
     }

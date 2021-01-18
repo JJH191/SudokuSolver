@@ -1,7 +1,7 @@
 ﻿using Accord;
 using System;
 
-namespace HelperClasses
+namespace Common
 {
     /// <summary>
     /// Simple wrapper that that supports simple maths and implicit conversion to System.Drawing.Point, System.Windows.Point and Accord.IntPoint

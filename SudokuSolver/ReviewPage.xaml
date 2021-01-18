@@ -13,9 +13,6 @@
         <converters:BitmapToBitmapImage x:Key="BitmapToBitmapImage"/>
         <converters:SuccessfulToStringConverter x:Key="SuccessfulToStringConverter"/>
     </Page.Resources>
-    <Page.DataContext>
-        <viewmodels:ReviewListViewModel/>
-    </Page.DataContext>
 
     <StackPanel>
         <TextBlock FontSize="30" HorizontalAlignment="Center" Width="300" TextAlignment="Center">Review</TextBlock>

@@ -1,6 +1,6 @@
 ﻿using Accord;
 using Accord.Imaging.Filters;
-using HelperClasses;
+using Common;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;

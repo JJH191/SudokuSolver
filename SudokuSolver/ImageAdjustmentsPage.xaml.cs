@@ -1,7 +1,7 @@
 ﻿using Accord;
 using Accord.Imaging;
 using DigitClassifier;
-using HelperClasses;
+using Common;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -25,6 +25,7 @@ namespace SudokuSolver
         private readonly SudokuImageViewModel viewModel;
         private readonly QuadViewModel quadViewModel;
 
+        private readonly string sudokuPath;
         private readonly double circleRadius = 7.5f;
         private int selected = -1;
 
@@ -33,6 +34,7 @@ namespace SudokuSolver
             InitializeComponent();
             viewModel = (SudokuImageViewModel)DataContext;
 
+            this.sudokuPath = sudokuPath;
             viewModel.Image = new Bitmap(sudokuPath);
             viewModel.Threshold = 0.6;
 
@@ -260,7 +262,7 @@ namespace SudokuSolver
             }
 
             // Navigate to next page with the sudoku grid
-            NavigationService.Navigate(new GridPage(sudoku));
+            NavigationService.Navigate(new GridPage(sudoku, sudokuPath));
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HelperClasses
+namespace Common
 {
     /// <summary>
     /// A LIFO data structure

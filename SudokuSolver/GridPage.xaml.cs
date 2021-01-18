@@ -1,8 +1,4 @@
-﻿using HelperClasses;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using Database;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,9 +15,11 @@ namespace SudokuSolver
     {
         //private readonly CellViewModel[,] cells = new CellViewModel[9,9];
         private readonly SudokuGridViewModel sudokuGrid;
+        private readonly string imagePath;
 
-        public GridPage(int[,] sudoku)
+        public GridPage(int[,] sudoku, string imagePath)
         {
+            this.imagePath = imagePath;
             sudokuGrid = new SudokuGridViewModel(sudoku);
             DataContext = sudokuGrid;
             
@@ -87,6 +85,7 @@ namespace SudokuSolver
                 else // Save
                 {
                     // TODO: Save
+                    SqliteDataAccess.Save(sudokuGrid.GetModel(), imagePath);
                     MessageBox.Show("Sudoku saved!", "Saved");
 
                     // Go back to main menu

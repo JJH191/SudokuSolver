@@ -1,4 +1,4 @@
-﻿namespace HelperClasses
+﻿namespace Common
 {
     /// <summary>
     /// Colour wrapper for System.Windows.Media.Color and System.Drawing.Color
