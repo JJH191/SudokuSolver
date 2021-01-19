@@ -39,7 +39,7 @@ namespace ViewModels
             get => !hasClickedSolve;
         }
 
-        public void HandleCellNumberChanged()
+        public void HandleCellNumberChanged(int oldValue, int newValue)
         {
             hasClickedSolve = false;
             ClearErrors();

@@ -18,13 +18,30 @@ namespace Models
         /// <param name="data">Data to fill the sudoku grid with</param>
         public SudokuGridModel(int[,] data)
         {
+            numberOfFilledCells = 0;
+
             Data = new CellModel[9, 9];
             for (int j = 0; j < data.GetLength(1); j++)
             {
                 for (int i = 0; i < data.GetLength(0); i++)
                 {
                     Data[i, j] = new CellModel(data[i, j]);
+                    Data[i, j].CellNumberModifiedEvent += CellNumberModifiedEvent;
+                    if (data[i, j] != -1) numberOfFilledCells++;
                 }
+            }
+        }
+
+        // Keeps track of how many cells contain numbers
+        private int numberOfFilledCells;
+
+        // Updates numberOfFilledCells when a cell changes
+        private void CellNumberModifiedEvent(int oldValue, int newValue)
+        {
+            if (newValue != oldValue) // Make sure there is a change
+            {
+                if (newValue == -1) numberOfFilledCells--; // If a value has been deleted (cell is now empty), the number of filled cells has reduced by 1
+                else if (oldValue == -1) numberOfFilledCells++; // If a value has assigned to an empty cell, the number of filled cells has increased by 1
             }
         }
 
@@ -130,7 +147,8 @@ namespace Models
 
         public bool IsFull()
         {
-            return IsFull(Data);
+            // If the number of filled cells is the same as the number of cells in the grid, it is full
+            return numberOfFilledCells == Data.GetLength(0) * Data.GetLength(1);
         }
 
         /// <summary>

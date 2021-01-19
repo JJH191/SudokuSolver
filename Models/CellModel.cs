@@ -1,6 +1,6 @@
 ﻿namespace Models
 {
-    public delegate void CellNumberModified();
+    public delegate void CellNumberModified(int oldValue, int newValue);
     public class CellModel
     {
         public event CellNumberModified CellNumberModifiedEvent;
@@ -12,8 +12,8 @@
             {
                 if (number != value)
                 {
+                    CellNumberModifiedEvent?.Invoke(number, value);
                     number = value;
-                    CellNumberModifiedEvent?.Invoke();
                 }
             }
         }
