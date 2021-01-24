@@ -6,11 +6,13 @@
              xmlns:local="clr-namespace:SudokuSolver"
              mc:Ignorable="d" 
              d:DesignHeight="550" d:DesignWidth="550">
-    <Grid Height="550" Width="550">
+    <Grid 
+        Width="{Binding Size, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SudokuGrid}}}"
+        Height="{Binding Size, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SudokuGrid}}}">
         <Grid.Background>
-            <ImageBrush ImageSource="blank-sudoku-grid.png"/>
+            <ImageBrush ImageSource="{StaticResource BlankSudoku}"/>
         </Grid.Background>
-        <Grid x:Name="GrdSudokuGrid" Margin="3">
+        <Grid x:Name="GrdSudokuGrid" Margin="{Binding MarginSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SudokuGrid}}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>

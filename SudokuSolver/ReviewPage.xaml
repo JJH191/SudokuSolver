@@ -8,7 +8,7 @@
       xmlns:converters="clr-namespace:ViewModels.Converters;assembly=ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="750" d:DesignWidth="600"
-      Width="900" Height="800"
+      Width="700" Height="800"
       Title="ReviewPage">
     <Page.Resources>
         <converters:BitmapToBitmapImage x:Key="BitmapToBitmapImage"/>
@@ -19,26 +19,31 @@
         <TextBlock FontSize="30" HorizontalAlignment="Center" Width="300" TextAlignment="Center">Review</TextBlock>
         <StackPanel Margin="10,0,0,0"  Orientation="Horizontal">
             <TextBlock Text="Success rate: "/>
-            <TextBlock Text="{Binding SuccessRate}"/>
+            <TextBlock Text="{Binding SuccessRate, StringFormat=N2}"/>
             <TextBlock Text="%"/>
         </StackPanel>
         <ListBox x:Name="LstReviewList" ItemsSource="{Binding Entries}"
                  BorderBrush="Transparent" 
                  Margin="0,10,0,0" 
-                 Width="900" Height="600" 
-                 ScrollViewer.CanContentScroll="false"
                  SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:ReviewPage}}}"
-                 MouseDoubleClick="LstReviewList_MouseDoubleClick">
+                 MouseDoubleClick="LstReviewList_MouseDoubleClick"
+                 VirtualizingPanel.IsContainerVirtualizable="True"
+                 VirtualizingPanel.IsVirtualizing="True"
+                 VirtualizingPanel.VirtualizationMode="Recycling"
+                 VirtualizingPanel.CacheLengthUnit="Page"
+                 VirtualizingPanel.CacheLength="1,1"
+                 ScrollViewer.IsDeferredScrollingEnabled="True"
+                 VirtualizingPanel.ScrollUnit="Pixel"
+                 MaxHeight="690">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Width="200" Height="200" Source="{Binding Image, Converter={StaticResource BitmapToBitmapImage}, Mode=OneWay}"/>
-                        <local:SudokuGrid DataGrid="{Binding SudokuGrid}"/>
-                        <StackPanel VerticalAlignment="Center">
+                    <VirtualizingStackPanel Orientation="Horizontal">
+                        <local:SudokuGrid Enabled="False" DataGrid="{Binding SudokuGrid}" Size="200" />
+                        <VirtualizingStackPanel VerticalAlignment="Center">
                             <TextBlock Margin="10,0" FontSize="20"  Text="{Binding Date, Mode=OneWay, StringFormat=\{0:D\}}"/>
                             <TextBlock Margin="10,0" FontSize="20" Text="{Binding SolvedSuccessfully, Converter={StaticResource SuccessfulToStringConverter}, Mode=OneWay}"/>
-                        </StackPanel>
-                    </StackPanel>
+                        </VirtualizingStackPanel>
+                    </VirtualizingStackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

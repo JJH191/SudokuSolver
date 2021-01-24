@@ -7,10 +7,10 @@
       xmlns:Converters="clr-namespace:ViewModels.Converters;assembly=ViewModels" x:Class="SudokuSolver.GridPage"
       mc:Ignorable="d" 
       d:DesignHeight="650" d:DesignWidth="550"
-      Title="GridPage">
+      Title="GridPage" Width="{Binding Size, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SudokuGrid}}}">
 
     <StackPanel>
-        <local:SudokuGrid x:Name="SudokuGrid" DataGrid="{Binding}"/>
+        <local:SudokuGrid x:Name="SudokuGrid" Enabled="True" DataGrid="{Binding}" Size="550"/>
         <Grid Margin="0,20,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
