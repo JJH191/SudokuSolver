@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -78,7 +79,7 @@ namespace DigitClassifier
         /// <returns>A new matrix which is the sum of <paramref name="matrix1"/> and <paramref name="matrix2"/></returns>
         public static Matrix operator +(Matrix matrix1, Matrix matrix2)
         {
-            if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new Exception("Shape error - matrices do not have the same shape");
+            if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new ArgumentException("Shape error - matrices do not have the same shape");
             return Map(matrix1, (value, i, j) => value + matrix2.data[i][j]); // Loop through all the values in matrix1 and add the value of matrix2 at the same location
         }
 
@@ -91,7 +92,7 @@ namespace DigitClassifier
         /// <returns>A new matrix where each element in <paramref name="matrix2"/> is subtracted from <paramref name="matrix1"/></returns>
         public static Matrix operator -(Matrix matrix1, Matrix matrix2)
         {
-            if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new Exception("Shape error - matrices do not have the same shape");
+            if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new ArgumentException("Shape error - matrices do not have the same shape");
             return Map(matrix1, (value, i, j) => value - matrix2.data[i][j]); // Loop through all the values in matrix1 and subtract the value of matrix2 at the same location
         }
 
@@ -107,28 +108,29 @@ namespace DigitClassifier
             return Map(matrix, (value) => value * val); // Loop through all the values in matrix and multiply them by val
         }
 
-        // TODO: Not my code
+        // TODO (ESSENTIAL): Not my code
         public static Matrix operator *(Matrix matrix1, Matrix matrix2)
         {
-            if (matrix1.data[0].Length != matrix2.data.Length) throw new Exception("Shape error - left matrix columns should equal right matrix rows");
+            if (matrix1.data[0].Length != matrix2.data.Length) throw new ArgumentException("Shape error - left matrix columns should equal right matrix rows");
 
-            double[][] newData = new double[matrix1.data.Length][]; 
+            double[][] matrixProduct = new double[matrix1.data.Length][]; 
 
             Parallel.For(0, matrix1.data.Length, i =>
             {
-                newData[i] = new double[matrix2.data[0].Length];
+                matrixProduct[i] = new double[matrix2.data[0].Length];
                 for (int j = 0; j < matrix2.data[0].Length; j++)
                 {
                     double sum = 0;
 
+                    // Multiply each row element in matrix1 by the corresponding element in the column of matrix2 and add it all up
                     for (int k = 0; k < matrix1.data[0].Length; k++)
                         sum += matrix1.data[i][k] * matrix2.data[k][j];
 
-                    newData[i][j] = sum;
+                    matrixProduct[i][j] = sum;
                 }
             });
 
-            return new Matrix(newData);
+            return new Matrix(matrixProduct);
         }
 
         /// <summary>
@@ -137,9 +139,9 @@ namespace DigitClassifier
         /// <param name="matrix1">First matrix</param>
         /// <param name="matrix2">Second matrix</param>
         /// <returns>A new matrix where each element is the product of the elements from <paramref name="matrix1"/> and <paramref name="matrix2"/></returns>
-        public static Matrix ScalarMultiply(Matrix matrix1, Matrix matrix2)
+        public static Matrix ScalarProduct(Matrix matrix1, Matrix matrix2)
         {
-            if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new Exception("Shape error - matrices do not have the same shape");
+            if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new ArgumentException("Shape error - matrices do not have the same shape");
 
             return Map(matrix1, (value, i, j) => value * matrix2.data[i][j]); // Loop through all the values in matrix1 and multiply by the value of matrix2 at the same location
         }
@@ -149,6 +151,7 @@ namespace DigitClassifier
         /// Transposing will swap the rows and columns of the matrix
         /// </summary>
         /// <returns>This matrix after being transposed</returns>
+        // TODO (ESSENTIAL): Not my code
         public Matrix GetTransposed()
         {
             Matrix transposed = new Matrix(data[0].Length, data.Length); // Create a new matrix with the rows and columns flipped
@@ -277,9 +280,9 @@ namespace DigitClassifier
             double[][] data = new double[rows][];
             for (int i = 0; i < rows; i++)
             {
+                data[i] = new double[cols];
                 for (int j = 0; j < cols; j++)
                 {
-                    if (j == 0) data[i] = new double[cols]; // TODO: Try moving this line outside the j for loop so no if statements are needed
                     data[i][j] = br.ReadDouble();
                 }
             }
@@ -288,10 +291,30 @@ namespace DigitClassifier
         }
         #endregion
 
-        // TODO: Not my code
         public double[] ToArray()
         {
-            return data.SelectMany(x => x.Select(y => y)).ToArray();
+            // TODO (CHECK): Check my code works (myArray) as it should (test)
+            var test = data.SelectMany(x => x.Select(y => y)).ToArray();
+            double[] myArray = new double[data.Length];
+            for (int i = 0; i < myArray.Length; i++)
+                myArray[i] = data[i][0];
+
+            if (!AreEqual(myArray, test))
+                throw new Exception("ToArray function failed!");
+
+            return myArray;
+        }
+
+        private bool AreEqual(double[] arr1, double[] arr2)
+        {
+            if (arr1.Length != arr2.Length) return false;
+
+            for (int i = 0; i < arr1.Length; i++)
+            {
+                if (arr1[i] != arr2[i]) return false;
+            }
+
+            return true;
         }
     }
 }

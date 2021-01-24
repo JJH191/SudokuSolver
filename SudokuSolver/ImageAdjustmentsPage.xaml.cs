@@ -38,7 +38,6 @@ namespace SudokuSolver
             viewModel.Image = new Bitmap(sudokuPath);
             viewModel.Threshold = 0.6;
 
-            //Bitmap resizedBitmap = new Bitmap(viewModel.Image, new System.Drawing.Size((int)image.Width, (int)image.Height));
             Vector2D[] detectedCorners = DetectCorners(viewModel.Image);
             quadViewModel = new QuadViewModel(detectedCorners);
 
@@ -67,12 +66,17 @@ namespace SudokuSolver
             CreateQuad();
         }
 
-        // TODO: not my code, Move to another file, Expand corners out a little (around 2px) as it only detects inside of line
+        // TODO (CLEANING): Move to another file?
+        // Code from https://stackoverflow.com/questions/5945156/c-sharp-detect-rectangles-in-image
+        // Modified to work as a function rather than just being in the Main() function
+        // I also added a function to check multiple subtypes (adding in some extra ones so it worked better for me)
+        // Then I added in some code to keep track of all the most extreme corners (tl, tr, bl, br) and expand these by 3px to make the corners lie on the line rather than next to it
         private Vector2D[] DetectCorners(Bitmap image)
         {
             // locating objects
             BlobCounter blobCounter = new BlobCounter
             {
+                // Modified configuration so it works for my case
                 FilterBlobs = true,
                 MinHeight = 30,
                 MinWidth = 30,
@@ -83,7 +87,7 @@ namespace SudokuSolver
             blobCounter.ProcessImage(image);
             Blob[] blobs = blobCounter.GetObjectsInformation();
 
-            // check for rectangles
+            // Check for rectangles
             Accord.Math.Geometry.SimpleShapeChecker shapeChecker = new Accord.Math.Geometry.SimpleShapeChecker();
 
             IntPoint topLeft = new IntPoint(image.Width, image.Height); // Start with max distance from top left
@@ -114,7 +118,6 @@ namespace SudokuSolver
                 }
             }
 
-            // BUG: TODO: goes outside image bounds
             // Expand the bounds by a bit as the detection finds the inside of the line
             int expand = 3;
             Vector2D[] corners = new Vector2D[]
@@ -226,11 +229,18 @@ namespace SudokuSolver
         private void BtnNext_Click(object sender, RoutedEventArgs e)
         {
             Bitmap adjustedImage = viewModel.GetAdjustedImage(quadViewModel);
-            adjustedImage = Invert(RemoveBorders(adjustedImage)); // Remove the borders of the sudoku and invert the colours so the image works with the neural network
+
+            if (adjustedImage == null) // Could not get the adjusted image as the corners were invalid
+            {
+                MessageBox.Show("Corners should form a square like shape. Make sure that the corners are with the image and try again", "Error - Invalid Corners");
+                return;
+            }
+
+            adjustedImage = RemoveBorders(adjustedImage).Invert(); // Remove the borders of the sudoku and invert the colours so the image works with the neural network
             float cellSize = adjustedImage.Width / 9f; // Get the size of an individual cell
 
             int[,] sudoku = new int[9, 9];
-            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("neural_network.nn"); // Create the classifier from the saved model
+            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("trained_network.nn"); // Create the classifier from the saved model
 
             for (int j = 0; j < 9; j++)
             {
@@ -252,8 +262,8 @@ namespace SudokuSolver
                         // Classify the digit
                         int classifiedDigit = classifier.GetDigit(cell);
 
-                        // If the digit is classified as 0 (which is not valid in sudoku), change it
-                        if (classifiedDigit == 0) classifiedDigit = 8; // TODO: work out what number is best to replace 0 with
+                        // If the digit is classified as 0 (which is not valid in sudoku), change it to 8 as this is the most likely 
+                        if (classifiedDigit == 0) classifiedDigit = 8; 
                         sudoku[i, j] = classifiedDigit;
                     }
                 }
@@ -305,7 +315,10 @@ namespace SudokuSolver
                 g.FillRectangle(new SolidBrush(System.Drawing.Color.Black), 0, 0, cell.Width, cell.Height);
 
                 System.Drawing.Rectangle destRect = new System.Drawing.Rectangle(border, border, centred.Width - border * 2, centred.Height - border * 2); // Destination rectangle that is a square with a border of the specified width
-                System.Drawing.Rectangle srcRect = new System.Drawing.Rectangle(centreX - maxOfWidthAndHeight / 2, centreY - maxOfWidthAndHeight / 2, maxOfWidthAndHeight, maxOfWidthAndHeight); // Rectangle on the source image that is the smallest square around the digit
+
+                int srcX = centreX - maxOfWidthAndHeight / 2;
+                int srcY = centreY - maxOfWidthAndHeight / 2;
+                System.Drawing.Rectangle srcRect = new System.Drawing.Rectangle(srcX, srcY, maxOfWidthAndHeight, maxOfWidthAndHeight); // Rectangle on the source image that is the smallest square around the digit
                 g.DrawImage(cell, destRect, srcRect, GraphicsUnit.Pixel); // Copy across the image from the source rect to the dest rect
             }
 
@@ -318,23 +331,6 @@ namespace SudokuSolver
         private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.GoBack();
-        }
-
-        // NOT MY CODE, move to BitmapUtils
-        private Bitmap Invert(Bitmap image)
-        {
-            Bitmap result = new Bitmap(image);
-            for (int y = 0; y <= (result.Height - 1); y++)
-            {
-                for (int x = 0; x <= (result.Width - 1); x++)
-                {
-                    Colour inv = result.GetPixel(x, y);
-                    inv = new Colour(255, (255 - inv.R), (255 - inv.G), (255 - inv.B));
-                    result.SetPixel(x, y, inv);
-                }
-            }
-
-            return result;
         }
 
         // Optimise?

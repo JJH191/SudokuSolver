@@ -14,12 +14,12 @@ namespace ViewModels.Converters
     /// </summary>
     public class BitmapToBitmapImage : IValueConverter
     {
-        // TODO: Not my code
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             Bitmap bitmap = (Bitmap)value;
             if (bitmap == null) return null;
 
+            // Code from https://stackoverflow.com/questions/94456/load-a-wpf-bitmapimage-from-a-system-drawing-bitmap/6775114
             BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
                 bitmap.GetHbitmap(),
                 IntPtr.Zero, Int32Rect.Empty,

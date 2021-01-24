@@ -32,7 +32,9 @@ namespace Models
             set => points[index] = value; // Set the point
         }
 
-        // TODO: optimise by using cross product instead of angle
+        // TODO (EXTRA FEATURE): optimise by using cross product instead of angle
+        // Based off tutorial at https://www.youtube.com/watch?v=YNyULRrydVI&t
+        // My implementation has a few differences, mainly that it written in C# and is made to work in the context I need with my own classes
         /// <summary>
         /// Gets the convex hull of the points in a clockwise order
         /// NOTE: If one point is inside the others, it will not be included in the hull, so the hull will only contain 3 points
@@ -88,6 +90,19 @@ namespace Models
                 current = smallestAngleCorner; // Change the current point to continue the hull from there
             }
 
+            if (clockwiseHull.Count != 4) return null; // If the number of points is 3, one point is inside the triangle formed by the other 3
+
+            // Check the points do not form an hourglass shape
+            // If the points are valid, their indices will alternate between odd and even e.g. 0, 1, 2, 3 or 0, 3, 2, 1
+            // However, if there is an odd index followed by another odd (or the same for even), this means that the quad is in an hourglass shape
+            bool isEven = Array.IndexOf(points, clockwiseHull[0]) % 2 == 0;
+            for (int i = 1; i < clockwiseHull.Count; i++)
+            {
+                bool isNextEven = Array.IndexOf(points, clockwiseHull[i]) % 2 == 0;
+                if (isNextEven == isEven) return null;
+                isEven = isNextEven;
+            }
+
             return clockwiseHull.ToArray();
         }
 
@@ -120,7 +135,7 @@ namespace Models
 
             // If the top left point is inside the others (and therefore inside the hull), take the left-most point to ensure the point is on the hull
             // This is necessary for GetClockwiseHull to work correctly
-            if (PointInTriangle2(topLeft, pointsExcludingTopleft))
+            if (PointInTriangle(topLeft, pointsExcludingTopleft))
             {
                 // Loop through and find the left-most point
                 foreach (Vector2D p in corners)
@@ -133,31 +148,31 @@ namespace Models
             return topLeft;
         }
 
-        private bool PointInTriangle2(Vector2D point, List<Vector2D> trianglePoints)
+        private bool PointInTriangle(Vector2D point, List<Vector2D> trianglePoints)
         {
             if (trianglePoints.Count != 3) throw new ArgumentException("trianglePoints should contain 3 points");
             return PointInTriangle(point, trianglePoints[0], trianglePoints[1], trianglePoints[2]);
         }
 
-        // NOT MY CODE
-        private double AreaOfTriangle(Vector2D p1, Vector2D p2, Vector2D p3)
+        // Code from https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+        private double Sign(Vector2D p1, Vector2D p2, Vector2D p3)
         {
             return (p1.X - p3.X) * (p2.Y - p3.Y) - (p2.X - p3.X) * (p1.Y - p3.Y);
         }
 
-        // NOT MY CODE
+        // Code from https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
         private bool PointInTriangle(Vector2D pt, Vector2D v1, Vector2D v2, Vector2D v3)
         {
             double d1, d2, d3;
             bool has_neg, has_pos;
-
-            d1 = AreaOfTriangle(pt, v1, v2);
-            d2 = AreaOfTriangle(pt, v2, v3);
-            d3 = AreaOfTriangle(pt, v3, v1);
-
+        
+            d1 = Sign(pt, v1, v2);
+            d2 = Sign(pt, v2, v3);
+            d3 = Sign(pt, v3, v1);
+        
             has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
             has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-
+        
             return !(has_neg && has_pos);
         }
     }

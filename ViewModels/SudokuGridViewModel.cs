@@ -77,7 +77,6 @@ namespace ViewModels
         /// <returns>Whether the sudoku was solved successfully</returns>
         public bool Solve()
         {
-            // TODO: Response to success/fail
             if (!sudokuGrid.Solve()) return false;
             else
             {
@@ -93,19 +92,25 @@ namespace ViewModels
             foreach (CellViewModel cell in cells) cell.NotifyChange();
         }
 
-        public void DisplayErrors()
+        public bool DisplayErrors()
         {
             displayingErrors = true;
+
+            bool hasErrors = false;
             for (int j = 0; j < 9; j++)
             {
                 for (int i = 0; i < 9; i++)
                 {
-                    cells[i, j].SetIsValid(sudokuGrid.IsCellValid(i, j));
+                    bool isValid = sudokuGrid.IsCellValid(i, j);
+                    if (!isValid) hasErrors = true;
+
+                    cells[i, j].SetIsValid(isValid);
                     cells[i, j].NotifyChange();
                 }
             }
 
             SolveOrCheck = "Save";
+            return hasErrors;
         }
 
         public void ClearErrors()

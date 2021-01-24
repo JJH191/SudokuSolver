@@ -16,7 +16,6 @@ namespace ViewModels.Converters
     /// </summary>
     public class ColourToSolidColourBrush : IValueConverter
     {
-        // TODO: Not my code
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             Colour colour = (Colour)value;

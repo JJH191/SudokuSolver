@@ -13,6 +13,8 @@ namespace DigitClassifier
         private Matrix errors;
         private Matrix deltas;
 
+        private readonly Random r = new Random();
+
         public Layer(int numberOfInputs, int numberOfOutputs, IActivationFunction activationFunction)
         {
             this.activationFunction = activationFunction;
@@ -30,7 +32,6 @@ namespace DigitClassifier
 
         public void Randomise()
         {
-            Random r = new Random();
             weights.Map((_) => r.NextDouble() - 0.5); // Distribute between -0.5 and 0.5
         }
 
@@ -46,9 +47,8 @@ namespace DigitClassifier
             Matrix targetSignals = new Matrix(targets);
             errors = targetSignals - outputs;
 
-
             Matrix outputDerivatives = Matrix.Map(outputs, activationFunction.DerivativeFunction);
-            Matrix gamma = Matrix.ScalarMultiply(errors, outputDerivatives);
+            Matrix gamma = Matrix.ScalarProduct(errors, outputDerivatives);
 
             deltas = gamma * new Matrix(prevLayerOutputs).GetTransposed();
         }
@@ -58,7 +58,7 @@ namespace DigitClassifier
             errors = forwardLayer.weights.GetTransposed() * forwardLayer.errors;
 
             Matrix outputDerivatives = Matrix.Map(outputs, activationFunction.DerivativeFunction);
-            Matrix gamma = Matrix.ScalarMultiply(errors, outputDerivatives);
+            Matrix gamma = Matrix.ScalarProduct(errors, outputDerivatives);
 
             deltas = gamma * new Matrix(prevLayerOutputs).GetTransposed();
         }

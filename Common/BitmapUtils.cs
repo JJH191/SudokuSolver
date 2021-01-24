@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Windows.Media;
 
 namespace Common
@@ -72,6 +74,61 @@ namespace Common
                         for (int j = y - 1; j <= y + 1; j++)
                             pixelsToFill.Push(new Vector2D(i, j));
                     // NOTE: Does not matter that I'm adding the current pixel to the stack as it will already be filled to the new colour so the flood fill will not do anything
+                }
+            }
+
+            return result;
+        }
+
+        // Code from https://stackoverflow.com/questions/1922040/how-to-resize-an-image-c-sharp/24199315
+        // Modified so it only takes a width so that the aspect ratio is maintained
+        /// <summary>
+        /// Resize the image to the specified width and height
+        /// </summary>
+        /// <param name="image">The image to resize</param>
+        /// <param name="width">The width to resize to</param>
+        /// <param name="height">The height to resize to</param>
+        /// <returns>The resized image</returns>
+        public static Bitmap Resize(this Bitmap image, int width)
+        {
+            int height = (int)((float)width / image.Width * image.Height);
+
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            return destImage;
+        }
+
+        // Code from https://stackoverflow.com/questions/33024881/invert-image-faster-in-c-sharp
+        // I cleaned this up a bit to make it more readable, including renaming variables.
+        // For example, the for loops go to less than width/height, whereas the original went to less than or equal to the width/height - 1
+        public static Bitmap Invert(this Bitmap image)
+        {
+            Bitmap result = new Bitmap(image);
+            for (int y = 0; y < result.Height; y++)
+            {
+                for (int x = 0; x < result.Width; x++)
+                {
+                    Colour inv = result.GetPixel(x, y);
+                    inv = new Colour(255, 255 - inv.R, 255 - inv.G, 255 - inv.B);
+                    result.SetPixel(x, y, inv);
                 }
             }
 

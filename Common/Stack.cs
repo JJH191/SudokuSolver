@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Common
 {
+    // TODO (ESSENTIAL): inspiration from https://developerslogblog.wordpress.com/2019/07/23/how-to-implement-a-stack-in-c/
     /// <summary>
     /// A LIFO data structure
     /// </summary>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -10,16 +11,16 @@ namespace TrainingInterface
     public class EmnistDataset : IDataset
     {
         private readonly InputData[] inputData;
-        private readonly Random rnd = new Random();
 
         public EmnistDataset(string directory)
         {
-            string imagesPath = Path.Combine(directory, "emnist-digits-train-images-idx3-ubyte");
-            string labelsPath = Path.Combine(directory, "emnist-digits-train-labels-idx1-ubyte");
+            // Code from https://stackoverflow.com/questions/46845406/read-emnist-database-in-c-sharp
+            // Modified to store the data in my inputData array rather than two seperate byte arrays
+            string images = Path.Combine(directory, "emnist-digits-train-images-idx3-ubyte");
+            string labels = Path.Combine(directory, "emnist-digits-train-labels-idx1-ubyte");
 
-            // TODO: Not my code
-            using (BinaryReader brImages = new BinaryReader(new FileStream(imagesPath, FileMode.Open)),
-                brLabels = new BinaryReader(new FileStream(labelsPath, FileMode.Open)))
+            using (BinaryReader brImages = new BinaryReader(new FileStream(images, FileMode.Open)),
+                                brLabels = new BinaryReader(new FileStream(labels, FileMode.Open)))
             {
                 int magic1 = ReadInt32Endian(brImages);
                 if (magic1 != 2051) throw new Exception($"Invalid magic number {magic1}!");
@@ -39,7 +40,8 @@ namespace TrainingInterface
                 int dimensions = numRows * numCols;
                 for (int i = 0; i < numImages; i++)
                 {
-                    double[] inputs = Transpose(brImages.ReadBytes(dimensions).Select(x => ((double)x / 255) * 0.99 + 0.01).ToArray(), numRows, numCols);
+                    // TODO (CHECK): Check MapRange normalises correctly
+                    double[] inputs = Transpose(brImages.ReadBytes(dimensions).Select(x => Utils.MapRange(x, 0, 255, 0.01, 1)).ToArray(), numRows, numCols);
                     int target = brLabels.ReadByte();
 
                     inputData[i] = new InputData(inputs, target);
@@ -47,32 +49,21 @@ namespace TrainingInterface
             }
         }
 
-        public InputData[] GetData() => inputData;
-
-        // TODO: Not my code
-        public void Shuffle()
-        {
-            int n = inputData.Length;
-            while (n > 1)
-            {
-                int k = rnd.Next(n--);
-
-                InputData temp = inputData[n];
-                inputData[n] = inputData[k];
-                inputData[k] = temp;
-            }
-        }
-
-        // TODO: Not my code
+        // Code from https://stackoverflow.com/questions/46845406/read-emnist-database-in-c-sharp
         private int ReadInt32Endian(BinaryReader br)
         {
             var bytes = br.ReadBytes(sizeof(int));
-            if (BitConverter.IsLittleEndian)
+            if (BitConverter.IsLittleEndian) 
                 Array.Reverse(bytes);
             return BitConverter.ToInt32(bytes, 0);
         }
 
-        // TODO: Not my code
+        public void Shuffle()
+        {
+            inputData.Shuffle();
+        }
+         
+        // TODO (ESSENTIAL): Not my code
         private double[] Transpose(double[] data, int width, int height)
         {
             double[] transposed = new double[data.Length];
@@ -90,5 +81,7 @@ namespace TrainingInterface
 
             return transposed;
         }
+
+        public InputData[] GetData() => inputData;
     }
 }

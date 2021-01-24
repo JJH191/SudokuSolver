@@ -12,9 +12,16 @@ namespace TrainingInterface
 
         public InputData(double[] inputs, int target)
         {
+            // Create a new target array with 10 elements
+            targets = new double[10];
+
+            // Set all the values in the targets array to 0.01
             // I do not use 0 here as it would carry through the network causing it to not work properly
-            targets = Enumerable.Range(0, 10).Select(x => 0.01).ToArray(); // Set all the values in the targets array to 0.01
-            targets[target] = 1; // Set the target index to 1
+            for (int i = 0; i < targets.Length; i++)
+            {
+                if (i == target) targets[i] = 1; // Set the target index to 1
+                else targets[i] = 0.01;
+            }
 
             this.inputs = inputs;
         }

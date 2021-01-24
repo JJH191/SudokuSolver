@@ -47,6 +47,8 @@ namespace DigitClassifier
         /// <returns>This <see cref="NeuralNetworkBuilder"/></returns>
         public NeuralNetworkBuilder SetOutputLayer(int nodes, IActivationFunction activationFunction)
         {
+            if (!hasSetInputLayer) throw new InvalidOperationException("Input layer must be set first");
+
             hasSetOutputLayer = true; // The output layer has been specified
             layers.Add(new LayerInfo(nodes, activationFunction)); // Create a new layer for output with the provided options
             return this;
@@ -60,6 +62,8 @@ namespace DigitClassifier
         /// <returns>This <see cref="NeuralNetworkBuilder"/></returns>
         public NeuralNetworkBuilder AddLayer(int nodes, IActivationFunction activationFunction)
         {
+            if (!hasSetInputLayer) throw new InvalidOperationException("Input layer must be set first");
+
             layers.Add(new LayerInfo(nodes, activationFunction)); // Create a new hidden layer with the provided options
             return this;
         }

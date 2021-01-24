@@ -12,7 +12,6 @@ namespace TrainingInterface
         {
             //TestNetwork(new NeuralNetworkDigitClassifier("trained_network.nn"));
             CreateAndTrainNetwork("trained_network.nn");
-            //HandwrittenDigits.Run();
         
             Console.ReadLine();
         }
@@ -41,8 +40,9 @@ namespace TrainingInterface
         {
             // Build a new neural network
             NeuralNetworkBuilder networkBuilder = new NeuralNetworkBuilder();
-            networkBuilder.SetLearningRate(0.3f) // was 0.035f
+            networkBuilder.SetLearningRate(0.05f) // was 0.035f
                 .SetInputLayer(784) // 784 = 28 * 28 (the size of the input images)
+                .AddLayer(150, Sigmoid.GetInstance())
                 .AddLayer(100, Sigmoid.GetInstance())
                 .SetOutputLayer(10, Sigmoid.GetInstance());
         
@@ -55,8 +55,8 @@ namespace TrainingInterface
 
             Console.WriteLine("Training network");
 
-            mnist.Shuffle();
-            InputData[] data = mnist.GetData();
+            emnist.Shuffle();
+            InputData[] data = emnist.GetData();
             ProgressBar progressBar = new ProgressBar(data.Length, 75);
             for (int i = 0; i < data.Length; i++)
             {
@@ -64,6 +64,20 @@ namespace TrainingInterface
                 if (i % 10 == 0) progressBar.PrintProgress(i); // Print the progress bar every 10 iterations (do not need to do it every iteration)
             }
             Console.WriteLine();
+
+            // 5 epochs
+            for (int epoch = 0; epoch < 3; epoch++)
+            {
+                mnist.Shuffle();
+                data = mnist.GetData();
+                progressBar = new ProgressBar(data.Length, 75);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    network.Train(data[i].inputs, data[i].targets); // Train the network with the provided data
+                    if (i % 10 == 0) progressBar.PrintProgress(i); // Print the progress bar every 10 iterations (do not need to do it every iteration)
+                }
+                Console.WriteLine();
+            }
         
             network.Save(savePath); // Save the network
             Console.WriteLine($"Done training. Saved to '{savePath}'");

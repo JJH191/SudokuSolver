@@ -85,7 +85,11 @@ namespace SudokuSolver
             }
             else // Check or save
             {
-                if (!sudokuGrid.IsButtonShowingSave) sudokuGrid.DisplayErrors(); // Check
+                if (!sudokuGrid.IsButtonShowingSave)// Check
+                {
+                    bool errors = sudokuGrid.DisplayErrors();
+                    if (!errors) MessageBox.Show("You made no mistakes, well done!", "Congratulations!");
+                }
                 else // Save
                 {
                     SqliteDataAccess.Save(sudokuGrid.GetModel(), SaveCopyOfImage(imagePath));
@@ -120,9 +124,8 @@ namespace SudokuSolver
         {
             int start = file.Replace('/', '\\').LastIndexOf("\\") + 1;
             int end = file.LastIndexOf(".");
-            int fileLength = file.Length;
-            string result = file.Substring(start, end - start);
-            return result;
+
+            return file.Substring(start, end - start);
         }
 
         private void BtnClearSudoku_Click(object sender, RoutedEventArgs e)

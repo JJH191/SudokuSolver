@@ -1,6 +1,5 @@
 ﻿using Common;
 using Models;
-using System;
 using System.ComponentModel;
 using System.Drawing;
 
@@ -52,10 +51,10 @@ namespace ViewModels
         public Bitmap GetAdjustedImage(QuadViewModel quad)
         {
             // Get the corners on the hull of the quad in a clockwise order
-            Vector2D[] clockwisePoints = quad.GetModel().GetClockwiseHull(); 
+            Vector2D[] clockwisePoints = quad.GetModel().GetClockwiseHull();
 
-            // TODO: deal with invalid corner
-            if (clockwisePoints.Length != 4) throw new Exception("Invalid corners!"); // If the number of points is 3, one point is inside the triangle formed by the other 3
+            if (clockwisePoints == null) // If the points are invalid
+                return null;
 
             return sudokuImage.GetAdjustedImage(clockwisePoints);
         }
