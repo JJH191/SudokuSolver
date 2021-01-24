@@ -25,7 +25,7 @@ namespace SudokuSolver
 
         private void LstReviewList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            new ReviewEntryDetailsWindow(SelectedItem).Show(); 
+            new ReviewEntryDetailsWindow(SelectedItem).Show();
         }
 
         private void BtnBack_Click(object sender, RoutedEventArgs e)

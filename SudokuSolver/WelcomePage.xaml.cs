@@ -14,7 +14,6 @@ namespace SudokuSolver
         public WelcomePage()
         {
             InitializeComponent();
-            SqliteDataAccess.GetReviewEntries();
         }
 
         /// <summary>

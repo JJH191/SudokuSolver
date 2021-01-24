@@ -33,7 +33,7 @@ namespace Database
         {
             using (IDbConnection connection = new SQLiteConnection(LoadConnectionString()))
             {
-                var sudokus = connection.Query<SudokuRow>("select * from Sudoku", new DynamicParameters());
+                var sudokus = connection.Query<SudokuRow>("select * from Sudoku order by Date", new DynamicParameters());
 
                 List<ReviewEntryModel> reviewEntries = new List<ReviewEntryModel>();
                 foreach (SudokuRow sudoku in sudokus)
@@ -44,7 +44,7 @@ namespace Database
 
                     int[,] grid = new int[9, 9];
                     foreach (CellRow cell in cells)
-                        grid[cell.Col, cell.Row] = cell.Value;
+                        grid[cell.Row, cell.Col] = cell.Value;
 
                     reviewEntry.SudokuGrid = new SudokuGridModel(grid);
                     reviewEntries.Add(reviewEntry);

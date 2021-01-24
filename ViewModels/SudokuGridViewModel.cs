@@ -68,9 +68,24 @@ namespace ViewModels
                     if (cells[i, j].Number == -1) SolveOrCheck = "Solve";
                 }
             }
-
         }
-    
+
+        public SudokuGridViewModel(SudokuGridModel grid)
+        {
+            sudokuGrid = grid;
+            SolveOrCheck = "Check";
+
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    sudokuGrid.Data[i, j].CellNumberModifiedEvent += HandleCellNumberChanged;
+                    cells[i, j] = new CellViewModel(sudokuGrid.Data[i, j]);
+                    if (cells[i, j].Number == -1) SolveOrCheck = "Solve";
+                }
+            }
+        }
+
         /// <summary>
         /// Handles solving of the sudoku
         /// </summary>

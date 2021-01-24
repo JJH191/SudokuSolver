@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:SudokuSolver"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <BitmapImage x:Key="BlankSudoku" UriSource="blank-sudoku-grid.png" />
     </Application.Resources>
 </Application>
