@@ -10,8 +10,8 @@ namespace TrainingInterface
     {
         static void Main()
         {
-            //TestNetwork(new NeuralNetworkDigitClassifier("trained_network.nn"));
-            CreateAndTrainNetwork("trained_network.nn");
+            //TestNetwork(new NeuralNetworkDigitClassifier("new_network.nn"));
+            CreateAndTrainNetwork("new_network.nn");
 
             Console.ReadLine();
         }
@@ -50,23 +50,23 @@ namespace TrainingInterface
 
             // Load in the dataset and shuffle it
             Console.WriteLine("Loading dataset");
-            IDataset mnist = new MnistDataset("../res/mnist_train.csv");
-            IDataset emnist = new EmnistDataset("../res");
+            IDataset mnist = new MnistDataset("res");
+            IDataset emnist = new EmnistDataset("res");
 
             Console.WriteLine("Training network");
 
-            emnist.Shuffle();
+            //emnist.Shuffle();
             InputData[] data = emnist.GetData();
             ProgressBar progressBar = new ProgressBar(data.Length, 75);
-            for (int i = 0; i < data.Length; i++)
-            {
-                network.Train(data[i].inputs, data[i].targets); // Train the network with the provided data
-                if (i % 10 == 0) progressBar.PrintProgress(i); // Print the progress bar every 10 iterations (do not need to do it every iteration)
-            }
-            Console.WriteLine();
+            //for (int i = 0; i < data.Length; i++)
+            //{
+            //    network.Train(data[i].inputs, data[i].targets); // Train the network with the provided data
+            //    if (i % 10 == 0) progressBar.PrintProgress(i); // Print the progress bar every 10 iterations (do not need to do it every iteration)
+            //}
+            //Console.WriteLine();
 
             // 5 epochs
-            for (int epoch = 0; epoch < 3; epoch++)
+            for (int epoch = 0; epoch < 5; epoch++)
             {
                 mnist.Shuffle();
                 data = mnist.GetData();
@@ -82,6 +82,5 @@ namespace TrainingInterface
             network.Save(savePath); // Save the network
             Console.WriteLine($"Done training. Saved to '{savePath}'");
         }
-
     }
 }

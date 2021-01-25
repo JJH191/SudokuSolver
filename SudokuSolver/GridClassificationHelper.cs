@@ -29,7 +29,7 @@ namespace SudokuSolver
                     float y = cellSize * j;
 
                     // Get an individual cell image
-                    Bitmap cell = grid.Clone(new System.Drawing.Rectangle((int)x, (int)y, (int)cellSize, (int)cellSize), grid.PixelFormat);
+                    Bitmap cell = grid.Clone(new Rectangle((int)x, (int)y, (int)cellSize, (int)cellSize), grid.PixelFormat);
                     float emptyThreshold = 0.05f; // Threshold to class a cell as empty
                     if (cell.GetAverageBrightness() < emptyThreshold) sudoku[i, j] = -1; // If the cell is empty, set its value to -1
                     else
