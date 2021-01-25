@@ -6,8 +6,9 @@
         public event CellNumberModified CellNumberModifiedEvent;
 
         private int number;
-        public int Number { 
-            get => number; 
+        public int Number
+        {
+            get => number;
             set
             {
                 if (number != value)

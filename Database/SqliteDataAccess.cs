@@ -5,11 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
-using System.Data.Common;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Database
 {
@@ -24,7 +20,7 @@ namespace Database
     {
         public int Row { get; set; }
         public int Col { get; set; }
-        public int Value{ get; set; }
+        public int Value { get; set; }
     }
 
     public class SqliteDataAccess

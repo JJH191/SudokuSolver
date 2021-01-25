@@ -1,5 +1,4 @@
-﻿using Database;
-using Models;
+﻿using Models;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,7 +12,8 @@ namespace ViewModels
         private readonly List<ReviewEntryViewModel> reviewEntries;
 
         // Contains all the entries
-        public List<ReviewEntryViewModel> Entries {
+        public List<ReviewEntryViewModel> Entries
+        {
             get => reviewEntries;
             private set => Entries = value;
         }
@@ -30,7 +30,7 @@ namespace ViewModels
 
         public ReviewListViewModel(List<ReviewEntryModel> reviewEntries)
         {
-            this.reviewEntries = reviewEntries.Select((entryModel) => new ReviewEntryViewModel(entryModel)).ToList(); 
+            this.reviewEntries = reviewEntries.Select((entryModel) => new ReviewEntryViewModel(entryModel)).ToList();
         }
     }
 }

@@ -9,7 +9,8 @@ namespace ViewModels
     {
         private readonly CellModel cell;
 
-        public int Number { 
+        public int Number
+        {
             get => cell.Number;
             set
             {
@@ -23,11 +24,11 @@ namespace ViewModels
             get => cell.IsValid ? (Colour)Colors.Transparent : new Colour(100, 255, 0, 0);
         }
 
-        public void SetIsValid(bool isValid) 
+        public void SetIsValid(bool isValid)
         {
             cell.IsValid = isValid;
             Notify(nameof(Colour));
-        } 
+        }
 
         public CellViewModel(CellModel cell)
         {
@@ -38,7 +39,7 @@ namespace ViewModels
 
         public void NotifyChange(bool number = true, bool colour = true)
         {
-            if(number) Notify(nameof(Number));
+            if (number) Notify(nameof(Number));
             if (colour) Notify(nameof(Colour));
         }
 

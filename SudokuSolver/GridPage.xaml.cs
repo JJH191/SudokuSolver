@@ -1,14 +1,10 @@
 ﻿using Database;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Media;
 using ViewModels;
-using ViewModels.Converters;
 
 namespace SudokuSolver
 {
@@ -80,7 +76,7 @@ namespace SudokuSolver
         {
             int start = file.Replace('/', '\\').LastIndexOf("\\") + 1;
             int end = file.LastIndexOf(".");
-            
+
             return file.Substring(start, end - start);
         }
 

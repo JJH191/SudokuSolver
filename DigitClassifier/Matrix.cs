@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DigitClassifier
@@ -113,7 +110,7 @@ namespace DigitClassifier
         {
             if (matrix1.data[0].Length != matrix2.data.Length) throw new ArgumentException("Shape error - left matrix columns should equal right matrix rows");
 
-            double[][] matrixProduct = new double[matrix1.data.Length][]; 
+            double[][] matrixProduct = new double[matrix1.data.Length][];
 
             Parallel.For(0, matrix1.data.Length, i =>
             {
@@ -163,7 +160,7 @@ namespace DigitClassifier
             {
                 for (int j = 0; j < data[i].Length; j++)
                 {
-                    transposed.data[j][i] = data[i][j]; 
+                    transposed.data[j][i] = data[i][j];
                 }
             }
 

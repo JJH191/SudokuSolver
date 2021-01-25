@@ -165,14 +165,14 @@ namespace Models
         {
             double d1, d2, d3;
             bool has_neg, has_pos;
-        
+
             d1 = Sign(pt, v1, v2);
             d2 = Sign(pt, v2, v3);
             d3 = Sign(pt, v3, v1);
-        
+
             has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
             has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-        
+
             return !(has_neg && has_pos);
         }
     }

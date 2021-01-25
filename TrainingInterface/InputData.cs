@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace TrainingInterface
+﻿namespace TrainingInterface
 {
     /// <summary>
     /// A wrapper to hold the inputs and target for training the network

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,7 +15,8 @@ namespace SudokuSolver
     public partial class SudokuGrid : UserControl, INotifyPropertyChanged
     {
         private int size = 200;
-        public int Size { 
+        public int Size
+        {
             get => size;
             set
             {
@@ -32,7 +32,7 @@ namespace SudokuSolver
         {
             get => size / 20;
         }
-        
+
         // Margin size is 1/180th of the size of the grid
         public int MarginSize
         {
@@ -40,8 +40,8 @@ namespace SudokuSolver
         }
 
         private SudokuGridViewModel sudokuGrid;
-        public SudokuGridViewModel DataGrid 
-        { 
+        public SudokuGridViewModel DataGrid
+        {
             get => sudokuGrid;
             set
             {
@@ -51,12 +51,13 @@ namespace SudokuSolver
                 // Do not fill the grid unless all properties have been initialised
                 // The initial grid filling will be called after InitializeComponent()
                 // Any further changes of DataGrid will be handled here
-                if (hasInitialised) FillGrid(); 
+                if (hasInitialised) FillGrid();
             }
         }
 
         private bool enabled = true;
-        public bool Enabled { 
+        public bool Enabled
+        {
             get => enabled;
             set
             {
@@ -80,7 +81,7 @@ namespace SudokuSolver
 
         public static readonly DependencyProperty DataGridProperty =
             DependencyProperty.Register(nameof(DataGrid), typeof(SudokuGridViewModel), typeof(SudokuGrid),
-            new PropertyMetadata(new SudokuGridViewModel(new int[9,9]), DataGridPropertyChanged));
+            new PropertyMetadata(new SudokuGridViewModel(new int[9, 9]), DataGridPropertyChanged));
 
         private void DataGridPropertyChanged(SudokuGridViewModel sudokuGrid)
         {
@@ -143,7 +144,7 @@ namespace SudokuSolver
             // This means that the user can only edit the grid if Enabled is true
             // I am using a textblock for when Enabled is false as it loads a lot faster than textbox, which is essential for the review section
             FrameworkElement text = Enabled ? (FrameworkElement)new TextBox() : new TextBlock();
-            text.SetBinding(Enabled ? TextBox.TextProperty: TextBlock.TextProperty, new Binding("Number") { Source = DataGrid[i, j], Converter = new IntToCellString(), UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
+            text.SetBinding(Enabled ? TextBox.TextProperty : TextBlock.TextProperty, new Binding("Number") { Source = DataGrid[i, j], Converter = new IntToCellString(), UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
 
             if (text is TextBox textBox)
             {

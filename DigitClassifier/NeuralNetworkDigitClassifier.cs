@@ -1,5 +1,4 @@
 ﻿using Common;
-using System;
 using System.Drawing;
 using System.Linq;
 

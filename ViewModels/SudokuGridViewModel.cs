@@ -1,11 +1,5 @@
-﻿using Common;
-using Models;
-using System;
-using System.Collections.Generic;
+﻿using Models;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Windows.Data;
-using System.Windows.Media;
 
 namespace ViewModels
 {
@@ -94,7 +88,7 @@ namespace ViewModels
         {
             if (!sudokuGrid.Solve()) return false;
             else
-            { 
+            {
                 UpdateCellsUI();
                 hasClickedSolve = true;
                 Notify(nameof(IsCheckButtonEnabled));
@@ -147,7 +141,7 @@ namespace ViewModels
         {
             return sudokuGrid.IsFull();
         }
-    
+
         /// <summary>
         /// Clears the sudoku grid
         /// </summary>
@@ -156,7 +150,7 @@ namespace ViewModels
             sudokuGrid.Clear();
             UpdateCellsUI();
         }
-    
+
         /// <summary>
         /// Access a cell in the sudoku grid at a given <paramref name="index"/>
         /// </summary>
@@ -171,7 +165,7 @@ namespace ViewModels
         }
 
         public SudokuGridModel GetModel() => sudokuGrid;
-    
+
         // Notifier for when a property changes
         public event PropertyChangedEventHandler PropertyChanged;
         private void Notify(string property)

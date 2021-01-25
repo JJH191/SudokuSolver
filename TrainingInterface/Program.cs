@@ -12,10 +12,10 @@ namespace TrainingInterface
         {
             //TestNetwork(new NeuralNetworkDigitClassifier("trained_network.nn"));
             CreateAndTrainNetwork("trained_network.nn");
-        
+
             Console.ReadLine();
         }
-        
+
         /// <summary>
         /// Allows the provided <paramref name="classifier"/> to be tested with an image path
         /// </summary>
@@ -26,12 +26,12 @@ namespace TrainingInterface
             {
                 Console.Write("Image path: "); // Ask for the image path
                 string path = Console.ReadLine();
-        
+
                 Bitmap image = (Bitmap)Image.FromFile(path); // Load the image
                 Console.WriteLine(classifier.GetDigit(image)); // Classify the digit
             }
         }
-        
+
         /// <summary>
         /// Creates a new network, trains it, then saves it to the provided <paramref name="savePath"/>
         /// </summary>
@@ -45,9 +45,9 @@ namespace TrainingInterface
                 .AddLayer(150, Sigmoid.GetInstance())
                 .AddLayer(100, Sigmoid.GetInstance())
                 .SetOutputLayer(10, Sigmoid.GetInstance());
-        
+
             NeuralNetwork network = networkBuilder.BuildNeuralNetwork();
-        
+
             // Load in the dataset and shuffle it
             Console.WriteLine("Loading dataset");
             IDataset mnist = new MnistDataset("../res/mnist_train.csv");
@@ -78,7 +78,7 @@ namespace TrainingInterface
                 }
                 Console.WriteLine();
             }
-        
+
             network.Save(savePath); // Save the network
             Console.WriteLine($"Done training. Saved to '{savePath}'");
         }

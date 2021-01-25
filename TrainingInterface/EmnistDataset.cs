@@ -40,7 +40,6 @@ namespace TrainingInterface
                 int dimensions = numRows * numCols;
                 for (int i = 0; i < numImages; i++)
                 {
-                    // TODO (CHECK): Check MapRange normalises correctly
                     double[] inputs = Transpose(brImages.ReadBytes(dimensions).Select(x => Utils.MapRange(x, 0, 255, 0.01, 1)).ToArray(), numRows, numCols);
                     int target = brLabels.ReadByte();
 
@@ -53,7 +52,7 @@ namespace TrainingInterface
         private int ReadInt32Endian(BinaryReader br)
         {
             var bytes = br.ReadBytes(sizeof(int));
-            if (BitConverter.IsLittleEndian) 
+            if (BitConverter.IsLittleEndian)
                 Array.Reverse(bytes);
             return BitConverter.ToInt32(bytes, 0);
         }
@@ -62,7 +61,7 @@ namespace TrainingInterface
         {
             inputData.Shuffle();
         }
-         
+
         // TODO (ESSENTIAL): Not my code
         private double[] Transpose(double[] data, int width, int height)
         {

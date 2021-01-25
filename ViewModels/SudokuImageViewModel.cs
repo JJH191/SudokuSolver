@@ -15,7 +15,7 @@ namespace ViewModels
         // Public property to access the image
         public Bitmap Image
         {
-            get => sudokuImage.Image; 
+            get => sudokuImage.Image;
             set
             {
                 sudokuImage.Image = value; // Set the new value

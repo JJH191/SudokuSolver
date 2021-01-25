@@ -208,7 +208,7 @@ namespace Models
         public List<Vector2I> GetErrors()
         {
             List<Vector2I> errors = new List<Vector2I>();
-        
+
             // Loop through all the cells and see if the number in that cell is valid
             for (int j = 0; j < 9; j++)
             {
@@ -217,7 +217,7 @@ namespace Models
                     if (!IsNumberValid(Data, Data[i, j].Number, i, j)) errors.Add(new Vector2I(i, j));
                 }
             }
-        
+
             return errors;
         }
 

@@ -1,5 +1,4 @@
-﻿using Database;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -31,11 +30,9 @@ namespace SudokuSolver
             NavigationService.Navigate(new ImageAdjustmentsPage(fileDialog.FileName));
         }
 
-        private ReviewPage cachedReviewPage;
         private void BtnReview_Click(object sender, RoutedEventArgs e)
         {
-            /*if (cachedReviewPage == null)*/ cachedReviewPage = new ReviewPage();
-            NavigationService.Navigate(cachedReviewPage);
+            NavigationService.Navigate(new ReviewPage());
         }
     }
 }

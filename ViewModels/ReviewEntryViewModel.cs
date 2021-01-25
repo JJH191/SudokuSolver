@@ -20,7 +20,8 @@ namespace ViewModels
         }
 
         private Bitmap cachedImage;
-        public Bitmap Image { 
+        public Bitmap Image
+        {
             get
             {
                 if (cachedImage == null) cachedImage = new Bitmap(model.ImagePath);
@@ -28,7 +29,7 @@ namespace ViewModels
             }
         }
 
-        public DateTime Date { get => model.Date; } 
+        public DateTime Date { get => model.Date; }
         public bool SolvedSuccessfully { get => model.WasSolvedSuccessfully(); }
         public SudokuGridViewModel SudokuGrid { get => sudokuGridViewModel; }
     }
