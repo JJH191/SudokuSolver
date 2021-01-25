@@ -94,7 +94,7 @@ namespace ViewModels
         {
             if (!sudokuGrid.Solve()) return false;
             else
-            {
+            { 
                 UpdateCellsUI();
                 hasClickedSolve = true;
                 Notify(nameof(IsCheckButtonEnabled));

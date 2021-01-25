@@ -14,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using ViewModels;
 using ViewModels.Converters;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace SudokuSolver
 {
@@ -236,7 +238,7 @@ namespace SudokuSolver
                 return;
             }
 
-            adjustedImage = RemoveBorders(adjustedImage).Invert(); // Remove the borders of the sudoku and invert the colours so the image works with the neural network
+            adjustedImage = adjustedImage.Invert(); // Remove the borders of the sudoku and invert the colours so the image works with the neural network
             float cellSize = adjustedImage.Width / 9f; // Get the size of an individual cell
 
             int[,] sudoku = new int[9, 9];
@@ -252,18 +254,22 @@ namespace SudokuSolver
 
                     // Get an individual cell image
                     Bitmap cell = adjustedImage.Clone(new System.Drawing.Rectangle((int)x, (int)y, (int)cellSize, (int)cellSize), adjustedImage.PixelFormat);
-
-                    float emptyThreshold = 0.02f; // Threshold to class a cell as empty
+                    float emptyThreshold = 0.05f; // Threshold to class a cell as empty
                     if (cell.GetAverageBrightness() < emptyThreshold) sudoku[i, j] = -1; // If the cell is empty, set its value to -1
                     else
                     {
-                        cell = CentreDigit(cell); // Centre the digit in the cell so it is more similar to the training data
+                        cell = CropCellToDigit(cell); // CentreDigit(cell); // Centre the digit in the cell so it is more similar to the training data
+                        if (cell == null)
+                        {
+                            sudoku[i, j] = -1;
+                            continue;
+                        }
 
                         // Classify the digit
                         int classifiedDigit = classifier.GetDigit(cell);
 
                         // If the digit is classified as 0 (which is not valid in sudoku), change it to 8 as this is the most likely 
-                        if (classifiedDigit == 0) classifiedDigit = 8; 
+                        if (classifiedDigit == 0) classifiedDigit = 8;
                         sudoku[i, j] = classifiedDigit;
                     }
                 }
@@ -274,39 +280,66 @@ namespace SudokuSolver
         }
 
         /// <summary>
-        /// Centres a digit within the cell bitmap
-        /// Note: The cell must be already cleaned and inverted for this to work
+        /// Go back to the welcome page
         /// </summary>
-        /// <param name="cell">The bitmap containing the digit</param>
-        /// <param name="border">The minimum number of pixels between an edge and the digit</param>
-        /// <returns></returns>
-        private Bitmap CentreDigit(Bitmap cell, int border = 10)
+        private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
-            int minX = int.MaxValue, maxX = int.MinValue; // Keeps track of the left-most and right-most white pixel
-            int minY = int.MaxValue, maxY = int.MinValue; // Keeps track of the top-most and bottom-most white pixel
+            NavigationService.GoBack();
+        }
 
-            for (int i = 0; i < cell.Width; i++)
+        private Bitmap CropCellToDigit(Bitmap cell, int border = 10)
+        {
+            Vector2I startPoint = FindPointInDigit(cell, new Vector2I(cell.Width / 2, cell.Height / 2));
+            if (startPoint == null) return null;
+            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(startPoint.X, startPoint.Y, 1, 1);
+
+            bool didExpandHorizontal = true;
+            bool didExpandVertical = true;
+            while (didExpandHorizontal || didExpandVertical)
             {
-                for (int j = 0; j < cell.Height; j++)
-                {
-                    if (cell.GetPixel(i, j).GetBrightness() > 0.95f) // If the pixel is white
+                didExpandHorizontal = false;
+                didExpandVertical = false;
+                for (int i = rect.Y; i < rect.Y + rect.Height; i++){
+                    if (rect.X > 0 && cell.GetPixel(rect.X - 1, i).GetBrightness() > 0.6f)
                     {
-                        // Check if it should be the new minimum or maximum
-                        if (i < minX) minX = i;
-                        if (i > maxX) maxX = i;
-                        if (j < minY) minY = j;
-                        if (j > maxY) maxY = j;
+                        rect.X -= 1;
+                        didExpandHorizontal = true; 
                     }
+
+                    if (rect.X + rect.Width < cell.Width - 1 && cell.GetPixel(rect.X + rect.Width, i).GetBrightness() > 0.6f) 
+                    {
+                        rect.Width += 1;
+                        didExpandHorizontal = true;
+                    }
+
+                    if (didExpandHorizontal) break;
+                }
+
+                for (int i = rect.X; i < rect.X + rect.Width; i++){
+                    if (rect.Y > 0 && cell.GetPixel(i, rect.Y - 1).GetBrightness() > 0.6f) 
+                    {
+                        rect.Y -= 1;
+                        didExpandVertical = true;
+                    }
+
+                    if (rect.Y + rect.Height < cell.Height - 1 && cell.GetPixel(i, rect.Y + rect.Height).GetBrightness() > 0.6f)
+                    {
+                        rect.Height += 1;
+                        didExpandVertical = true;
+                    }
+
+                    if (didExpandVertical) break;
                 }
             }
 
-            // Find the centre of the rectangle containing the digit
-            int centreX = (maxX + minX) / 2;
-            int centreY = (maxY + minY) / 2;
+            // If the rectangle surrounding the digit is within 4px of the cell width, it is likely that the border was included in the rectangle
+            // This happens when the digit touches the border, so to fix it, I shrink the rectangle by 4px and then recrop the cell (to centre it)
+            bool isBorderIncluded = Math.Abs(cell.Width - rect.Width) + Math.Abs(cell.Height - rect.Height) < 4;
+            if (isBorderIncluded) rect.Inflate(-4, -4);
 
             // Get the largest dimension of the rectangle
             // This is so that the source rectangle is square to prevent any stretching
-            int maxOfWidthAndHeight = Math.Max(maxX - minX+1, maxY - minY+1); // Note: I add 1 so that the maxX and maxY pixels are included, otherwise there is a cutoff
+            int maxOfWidthAndHeight = Math.Max(rect.Width, rect.Height); // Note: I add 1 so that the maxX and maxY pixels are included, otherwise there is a cutoff
 
             Bitmap centred = new Bitmap(cell.Width, cell.Height);
             using (Graphics g = Graphics.FromImage(centred))
@@ -316,40 +349,46 @@ namespace SudokuSolver
 
                 System.Drawing.Rectangle destRect = new System.Drawing.Rectangle(border, border, centred.Width - border * 2, centred.Height - border * 2); // Destination rectangle that is a square with a border of the specified width
 
-                int srcX = centreX - maxOfWidthAndHeight / 2;
-                int srcY = centreY - maxOfWidthAndHeight / 2;
+                int srcX = rect.Center().X - maxOfWidthAndHeight / 2;
+                int srcY = rect.Center().Y - maxOfWidthAndHeight / 2;
                 System.Drawing.Rectangle srcRect = new System.Drawing.Rectangle(srcX, srcY, maxOfWidthAndHeight, maxOfWidthAndHeight); // Rectangle on the source image that is the smallest square around the digit
                 g.DrawImage(cell, destRect, srcRect, GraphicsUnit.Pixel); // Copy across the image from the source rect to the dest rect
             }
 
+            if (isBorderIncluded) return CropCellToDigit(centred); 
             return centred;
         }
 
-        /// <summary>
-        /// Go back to the welcome page
-        /// </summary>
-        private void BtnBack_Click(object sender, RoutedEventArgs e)
+        private Vector2I FindPointInDigit(Bitmap cell, Vector2I start)
         {
-            NavigationService.GoBack();
-        }
+            Common.Queue<Vector2I> toSearch = new Common.Queue<Vector2I>(28);
+            List<Vector2I> alreadySearched = new List<Vector2I>();
+            toSearch.Push(start);
 
-        // Optimise?
-        private Bitmap RemoveBorders(Bitmap source)
-        {
-            Bitmap result = new Bitmap(source);
-            for (int i = 0; i < result.Width; i += 5)
+            float percentageWidthForBorder = 1 / 3f;
+            int borderToIgnore = (int)(cell.Width * percentageWidthForBorder);
+
+            while (toSearch.Count > 0)
             {
-                if (source.GetPixel(i, 0).GetBrightness() < 0.95f) result = result.FloodFill(new Vector2D(i, 0), tolerance: 1f); // Top
-                if (source.GetPixel(i, result.Height - 1).GetBrightness() < 0.95f) result = result.FloodFill(new Vector2D(i, result.Height - 1), tolerance: 1f); // Bottom
+                Vector2I current = toSearch.Pop();
+                if (alreadySearched.Contains(current)) continue;
+                if (current.X < 0 || current.Y < 0 || current.X >= cell.Width || current.Y >= cell.Height) return null;
+                if (current.X < borderToIgnore || current.Y < borderToIgnore || current.X >= cell.Width - borderToIgnore || current.Y >= cell.Height - borderToIgnore) 
+                    return null;
+                alreadySearched.Add(current);
+
+                if (cell.GetPixel(current.X, current.Y).GetBrightness() > 0.6f) return current;
+                else
+                {
+                    // Left, right, up, down
+                    toSearch.Push(current + new Vector2I(-1,  0));
+                    toSearch.Push(current + new Vector2I( 1,  0));
+                    toSearch.Push(current + new Vector2I( 0, -1));
+                    toSearch.Push(current + new Vector2I( 0,  1));
+                }
             }
 
-            for (int i = 0; i < result.Height; i += 5)
-            {
-                if (source.GetPixel(0, i).GetBrightness() < 0.95f) result = result.FloodFill(new Vector2D(0, i), tolerance: 1f); // Left
-                if (source.GetPixel(result.Width - 1, i).GetBrightness() < 0.95f) result = result.FloodFill(new Vector2D(result.Width - 1, i), tolerance: 1f); // Right
-            }
-
-            return result;
+            return null;
         }
     }
 }

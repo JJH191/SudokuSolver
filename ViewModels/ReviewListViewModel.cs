@@ -19,7 +19,14 @@ namespace ViewModels
         }
 
         // Provides the success rate of the user
-        public float SuccessRate { get => reviewEntries.Sum((entry) => entry.SolvedSuccessfully ? 1 : 0) / (float)reviewEntries.Count * 100; }
+        public float SuccessRate
+        {
+            get
+            {
+                if (reviewEntries.Count == 0) return 0; // Avoid divide by 0 error
+                return reviewEntries.Sum((entry) => entry.SolvedSuccessfully ? 1 : 0) / (float)reviewEntries.Count * 100;
+            }
+        }
 
         public ReviewListViewModel(List<ReviewEntryModel> reviewEntries)
         {

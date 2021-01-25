@@ -63,9 +63,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitmapLocker.cs" />
     <Compile Include="BitmapUtils.cs" />
     <Compile Include="Colour.cs" />
     <Compile Include="ListUtils.cs" />
+    <Compile Include="Queue.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Vector2I.cs" />
     <Compile Include="Vector2D.cs" />

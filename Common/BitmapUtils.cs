@@ -48,6 +48,9 @@ namespace Common
         {
             if (fillCol == null) fillCol = Colors.White; // Default fill colour is white
             Bitmap result = new Bitmap(image); // Copy the bitmap so it doesn't affect the original
+            BitmapLocker lockBitmap = new BitmapLocker(result);
+
+            lockBitmap.LockBits();
 
             // Create a new stack with a start length of 20 and push the first pixel to fill
             Stack<Vector2D> pixelsToFill = new Stack<Vector2D>(20);
@@ -63,11 +66,11 @@ namespace Common
                 int y = (int)currentPixel.Y;
                 if (x < 0 || y < 0 || x >= result.Width || y >= result.Height) continue;
 
-                Colour pixelCol = result.GetPixel(x, y); // Get the pixel colour
+                Colour pixelCol = lockBitmap.GetPixel(x, y); // Get the pixel colour
                 if (Math.Abs(pixelCol.GetBrightness() - brightness) < tolerance) // If colour is within tolerance
                 {
                     // Fill the pixel with the fill colour
-                    result.SetPixel(x, y, fillCol);
+                    lockBitmap.SetPixel(x, y, fillCol);
 
                     // Add neighbouring pixels to stack
                     for (int i = x - 1; i <= x + 1; i++)
@@ -76,6 +79,8 @@ namespace Common
                     // NOTE: Does not matter that I'm adding the current pixel to the stack as it will already be filled to the new colour so the flood fill will not do anything
                 }
             }
+
+            lockBitmap.UnlockBits();
 
             return result;
         }
@@ -122,15 +127,19 @@ namespace Common
         public static Bitmap Invert(this Bitmap image)
         {
             Bitmap result = new Bitmap(image);
+            BitmapLocker bitmapLocker = new BitmapLocker(result);
+
+            bitmapLocker.LockBits();
             for (int y = 0; y < result.Height; y++)
             {
                 for (int x = 0; x < result.Width; x++)
                 {
-                    Colour inv = result.GetPixel(x, y);
+                    Colour inv = bitmapLocker.GetPixel(x, y);
                     inv = new Colour(255, 255 - inv.R, 255 - inv.G, 255 - inv.B);
-                    result.SetPixel(x, y, inv);
+                    bitmapLocker.SetPixel(x, y, inv);
                 }
             }
+            bitmapLocker.UnlockBits();
 
             return result;
         }
