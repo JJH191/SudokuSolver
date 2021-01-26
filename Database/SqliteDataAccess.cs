@@ -29,7 +29,7 @@ namespace Database
         {
             using (IDbConnection connection = new SQLiteConnection(LoadConnectionString()))
             {
-                var sudokus = connection.Query<SudokuRow>("select * from Sudoku order by Date", new DynamicParameters());
+                var sudokus = connection.Query<SudokuRow>("select * from Sudoku order by Date desc", new DynamicParameters());
 
                 List<ReviewEntryModel> reviewEntries = new List<ReviewEntryModel>();
                 foreach (SudokuRow sudoku in sudokus)
@@ -70,7 +70,7 @@ namespace Database
                 transaction.Commit();
                 connection.Close();
 
-                string date = DateTime.Now.ToString("yyyy-MM-dd");
+                string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 connection.Execute("insert into Sudoku (ImagePath, Date, GridId) values (@imagePath, @date, @gridID)", new { imagePath, date, gridID });
             }
         }

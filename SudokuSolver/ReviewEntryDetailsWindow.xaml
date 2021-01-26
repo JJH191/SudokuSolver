@@ -8,7 +8,8 @@
         xmlns:local="clr-namespace:SudokuSolver"
         mc:Ignorable="d"
         SizeToContent="WidthAndHeight"
-        Title="{Binding Date, StringFormat=\{0:D\}}">
+        Title="{Binding Date, StringFormat=\{0:D\}}"
+        ResizeMode="CanMinimize">
     <Window.Resources>
         <converters:BitmapToBitmapImage x:Key="BitmapToBitmapImage"/>
         <converters:SuccessfulToStringConverter x:Key="SuccessfulToStringConverter"/>

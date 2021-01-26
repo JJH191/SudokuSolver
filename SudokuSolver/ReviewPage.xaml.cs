@@ -1,5 +1,4 @@
-﻿using Database;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
@@ -19,7 +18,7 @@ namespace SudokuSolver
         {
             InitializeComponent();
 
-            reviewEntries = new ReviewListViewModel(SqliteDataAccess.GetReviewEntries());
+            reviewEntries = new ReviewListViewModel();
             DataContext = reviewEntries;
         }
 

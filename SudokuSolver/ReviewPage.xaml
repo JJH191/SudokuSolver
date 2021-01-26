@@ -17,11 +17,25 @@
 
     <StackPanel>
         <TextBlock FontSize="30" HorizontalAlignment="Center" Width="300" TextAlignment="Center">Review</TextBlock>
-        <StackPanel Margin="10,0,0,0"  Orientation="Horizontal">
-            <TextBlock Text="Success rate: "/>
-            <TextBlock Text="{Binding SuccessRate, StringFormat=N2}"/>
-            <TextBlock Text="%"/>
-        </StackPanel>
+        <Grid Margin="10,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Success rate: "/>
+            <TextBlock Grid.Column="1" Text="{Binding SuccessRate, StringFormat=N2}"/>
+            <TextBlock Grid.Column="2" Text="%"/>
+
+            <TextBlock Grid.Column="4" Text="Sort by:" VerticalAlignment="Center"/>
+            <ComboBox Grid.Column="5" Width="100" Margin="10,0" SelectedIndex="{Binding SelectedIndex, FallbackValue=0, Mode=OneWayToSource}">
+                <ComboBoxItem>Newest first</ComboBoxItem>
+                <ComboBoxItem>Oldest first</ComboBoxItem>
+            </ComboBox>
+        </Grid>
         <ListBox x:Name="LstReviewList" ItemsSource="{Binding Entries}"
                  BorderBrush="Transparent" 
                  Margin="0,10,0,0" 

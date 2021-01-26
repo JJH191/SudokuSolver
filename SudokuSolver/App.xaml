@@ -5,5 +5,12 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <BitmapImage x:Key="BlankSudoku" UriSource="blank-sudoku-grid.png" />
+        <Style TargetType="{x:Type FrameworkElement}" x:Key="baseStyle">
+            <Setter Property="TextElement.FontFamily" Value="res/#Barlow" />
+        </Style>
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource baseStyle}"></Style>
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource baseStyle}"></Style>
+        <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource baseStyle}"></Style>
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource baseStyle}"></Style>
     </Application.Resources>
 </Application>

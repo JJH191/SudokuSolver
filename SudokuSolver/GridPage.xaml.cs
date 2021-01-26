@@ -63,6 +63,7 @@ namespace SudokuSolver
 
         private int GetNextImageIndex(string directory)
         {
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
             int mostRecent = Directory.GetFiles(directory).Select((file) =>
             {
                 if (!int.TryParse(GetFileNameWithoutExtension(file), out int fileNumber)) return int.MinValue;

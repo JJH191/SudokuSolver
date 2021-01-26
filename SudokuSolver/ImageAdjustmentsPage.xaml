@@ -21,6 +21,8 @@
                 MouseMove="CvsImage_MouseMoved" MouseDown="CvsImage_MouseDown" MouseUp="CvsImage_MouseUp">
             <Image Source="{Binding Image, Converter={StaticResource BitmapToBitmapImage}}" Width="{Binding Image.Width}" Height="{Binding Image.Height}"/>
         </Canvas>
+        <TextBlock Foreground="#CC000000" FontSize="15" Margin="0,15,0,0">Drag the circles so that the outline matches your sudoku. You can press estimate corners to let the computer guess where they are</TextBlock>
+        <TextBlock Foreground="#CC000000" FontSize="15">Then adjust the slider so the numbers are clear, but try to avoid specs or other artefacts. Do not worry about the lines disappearing</TextBlock>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,15,0,0">
             <Button Content="Back" Width="75" Height="25" Margin="0,0,15,0" VerticalAlignment="Center" Click="BtnBack_Click"/>
             <Slider Width="400" Height="25" Maximum="1" ValueChanged="SldThreshold_ValueChanged" Value="{Binding Threshold}" LargeChange="0.1" VerticalAlignment="Center"/>
