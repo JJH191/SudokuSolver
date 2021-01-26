@@ -4,9 +4,9 @@
              xmlns:local="clr-namespace:SudokuSolver"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <BitmapImage x:Key="BlankSudoku" UriSource="blank-sudoku-grid.png" />
+        <BitmapImage x:Key="BlankSudoku" UriSource="res/blank-sudoku-grid.png" />
         <Style TargetType="{x:Type FrameworkElement}" x:Key="baseStyle">
-            <Setter Property="TextElement.FontFamily" Value="res/#Barlow" />
+            <Setter Property="TextElement.FontFamily" Value="res/Barlow/#Barlow" />
         </Style>
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource baseStyle}"></Style>
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource baseStyle}"></Style>

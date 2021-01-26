@@ -32,78 +32,72 @@ namespace Models
             set => points[index] = value; // Set the point
         }
 
-        // TODO (EXTRA FEATURE): optimise by using cross product instead of angle
-        // Based off tutorial at https://www.youtube.com/watch?v=YNyULRrydVI&t
-        // My implementation has a few differences, mainly that it written in C# and is made to work in the context I need with my own classes
+        // Based on pseudocode from wikipedia: https://en.wikipedia.org/wiki/Gift_wrapping_algorithm
+        // Using suggestion of cross-product for angles from tutorial at https://www.youtube.com/watch?v=YNyULRrydVI&t
         /// <summary>
         /// Gets the convex hull of the points in a clockwise order
-        /// NOTE: If one point is inside the others, it will not be included in the hull, so the hull will only contain 3 points
+        /// NOTE: If one point is inside the others, or the corners form an hourglass, the hull is invalid, so this will return null
         /// </summary>
-        /// <returns>The corners of the quad in clockwise order</returns>
+        /// <returns>The corners of the quad in clockwise order or null if invalid</returns>
         public Vector2D[] GetClockwiseHull()
         {
-            // This algorithm works by starting with the top left point
-            // With this top left point, it will loop through all the other points and find the relative vector to them
-            // It will then calculate the angle between this relative vector and the y-axis
-            // The smallest angle will be the next point in the hull, going clockwise
-            // Once the top left point is reached again, the hull is complete
+            // Get the top left point that is definitely on the hull
+            Vector2D current = GetTopLeftPointOnHull(points); // Keeps track of the current point on the hull
+            Vector2D endpoint; // Keeps track of the current best point to add to the hull
 
-            List<Vector2D> cornersLeft = new List<Vector2D>(points); // Keeps track of the corners left to add to the hull
+            // Keeps track of the hull in a clockwise order
+            List<Vector2D> clockwiseHull = new List<Vector2D>();
 
-            // Get the top left point and start with that
-            Vector2D topLeft = GetTopLeftPointOnHull(cornersLeft);
-            Vector2D current = topLeft;
-            cornersLeft.Remove(current);
-
-            // The hull of the quad's points in a clockwise order, starting with the top left
-            List<Vector2D> clockwiseHull = new List<Vector2D> { current };
-
-            // Loop until no corners left to add
-            while (cornersLeft.Count > 0)
+            do
             {
-                // Start with smallest angle as 2pi (the maximum  possible angle) and no smallest angle corner
-                Vector2D smallestAngleCorner = null;
-                double smallestAngle = Math.PI * 2;
+                clockwiseHull.Add(current); // Add the point to the hull
+                endpoint = points[0]; // Start with first point in the unsorted points list
 
-                // Loop through the remaining corners and find the one with the smallest angle between it and the current corner
-                foreach (Vector2D corner in cornersLeft)
+                // Loop through all the points and find the next one on the hull (this is the one that is the greatest 'left turn' from the current point on the hull)
+                for (int i = 0; i < points.Length; i++)
                 {
-                    // Get the angle, clockwise, from negative y-axis (negative y is used here because angle expects up to be positive, but images take down as positive)
-                    double angle = (corner - current).Angle(axis: Vector2D.Axis.NEG_Y, direction: Vector2D.Direction.CLOCKWISE);
-                    if (angle < smallestAngle)
-                    {
-                        smallestAngle = angle;
-                        smallestAngleCorner = corner;
-                    }
+                    Vector2D currentToEndpoint = endpoint - current; // Vector from the current point on the hull to the current endpoint
+                    Vector2D checkingToEndpoint = endpoint - points[i]; // Vector from the current point being checked to the current endpoint
+
+                    // If the endpoint is the current point or the checking point is to the left of the line currentToEndpoint, that is the new endpoint
+                    if (endpoint == current || checkingToEndpoint.CrossProduct(currentToEndpoint) < 0)
+                        endpoint = points[i];
                 }
 
-                // If we have reached the start again, the hull is complete, so exit
-                // Since we start with the top left, we do not want to check top left with itself
-                if (current != topLeft)
-                {
-                    double angleToStart = (topLeft - current).Angle(axis: Vector2D.Axis.NEG_Y, direction: Vector2D.Direction.CLOCKWISE);
-                    if (angleToStart < smallestAngle) break;
-                }
+                current = endpoint; // Set the current point to be the endpoint (next point on the hull)
+            } while (endpoint != clockwiseHull[0]); // Break out once we reach the start point
 
-                clockwiseHull.Add(smallestAngleCorner); // Add the new point to the hull
-                cornersLeft.Remove(smallestAngleCorner); // Remove the point from cornersLeft so it isn't checked again
-                current = smallestAngleCorner; // Change the current point to continue the hull from there
-            }
+            // Check that the hull is a valid quad and return it if it is
+            if (!IsHullValid(clockwiseHull.ToArray())) return null;
+            return clockwiseHull.ToArray();
+        }
 
-            if (clockwiseHull.Count != 4) return null; // If the number of points is 3, one point is inside the triangle formed by the other 3
+        private bool IsHullValid(Vector2D[] hull)
+        {
+            // If the number of points is 3, one point is inside the triangle formed by the other 3
+            if (hull.Length != 4) return false;
+            if (IsHourglassShape(hull)) return false;
+            return true;
+        }
 
-            // Check the points do not form an hourglass shape
+        /// <summary>
+        /// Check if the corners are arranged in an hourglass shape
+        /// </summary>
+        /// <param name="hull">The hull to check the original corners against</param>
+        /// <returns>True if the corners form an hourglass, otherwise false</returns>
+        private bool IsHourglassShape(Vector2D[] hull)
+        {
             // If the points are valid, their indices will alternate between odd and even e.g. 0, 1, 2, 3 or 0, 3, 2, 1
             // However, if there is an odd index followed by another odd (or the same for even), this means that the quad is in an hourglass shape
-            bool isEven = Array.IndexOf(points, clockwiseHull[0]) % 2 == 0;
-            for (int i = 1; i < clockwiseHull.Count; i++)
+            bool isEven = Array.IndexOf(points, hull[0]) % 2 == 0;
+            for (int i = 1; i < hull.Length; i++)
             {
-                bool isNextEven = Array.IndexOf(points, clockwiseHull[i]) % 2 == 0;
-                if (isNextEven == isEven) return null;
+                bool isNextEven = Array.IndexOf(points, hull[i]) % 2 == 0;
+                if (isNextEven == isEven) return true;
                 isEven = isNextEven;
             }
 
-            return clockwiseHull.ToArray();
+            return false;
         }
 
         /// <summary>
@@ -111,7 +105,7 @@ namespace Models
         /// </summary>
         /// <param name="corners">The points to find the top left of</param>
         /// <returns>The top left point of the given points</returns>
-        private Vector2D GetTopLeftPointOnHull(List<Vector2D> corners)
+        private Vector2D GetTopLeftPointOnHull(Vector2D[] corners)
         {
             // Start with null top left point and largest possible distance
             Vector2D topLeft = null;

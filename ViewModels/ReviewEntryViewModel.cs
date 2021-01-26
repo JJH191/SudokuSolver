@@ -10,13 +10,12 @@ namespace ViewModels
     public class ReviewEntryViewModel
     {
         private readonly ReviewEntryModel model;
-        private readonly SudokuGridViewModel sudokuGridViewModel;
 
         public ReviewEntryViewModel(ReviewEntryModel model)
         {
             this.model = model;
-            sudokuGridViewModel = new SudokuGridViewModel(model.SudokuGrid);
-            sudokuGridViewModel.DisplayErrors();
+            SudokuGrid = new SudokuGridViewModel(model.SudokuGrid);
+            SudokuGrid.DisplayErrors();
         }
 
         private Bitmap cachedImage;
@@ -31,6 +30,6 @@ namespace ViewModels
 
         public DateTime Date { get => model.Date; }
         public bool SolvedSuccessfully { get => model.WasSolvedSuccessfully(); }
-        public SudokuGridViewModel SudokuGrid { get => sudokuGridViewModel; }
+        public SudokuGridViewModel SudokuGrid { get; }
     }
 }

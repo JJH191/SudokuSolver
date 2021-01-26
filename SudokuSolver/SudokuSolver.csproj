@@ -166,7 +166,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="db.db">
+    <None Include="res\db.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
@@ -174,61 +174,61 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Resource Include="res\Barlow-Black.ttf">
+    <Resource Include="res\Barlow\Barlow-Black.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-BlackItalic.ttf">
+    <Resource Include="res\Barlow\Barlow-BlackItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-Bold.ttf">
+    <Resource Include="res\Barlow\Barlow-Bold.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-BoldItalic.ttf">
+    <Resource Include="res\Barlow\Barlow-BoldItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-ExtraBold.ttf">
+    <Resource Include="res\Barlow\Barlow-ExtraBold.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-ExtraBoldItalic.ttf">
+    <Resource Include="res\Barlow\Barlow-ExtraBoldItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-ExtraLight.ttf">
+    <Resource Include="res\Barlow\Barlow-ExtraLight.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-ExtraLightItalic.ttf">
+    <Resource Include="res\Barlow\Barlow-ExtraLightItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-Italic.ttf">
+    <Resource Include="res\Barlow\Barlow-Italic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-Light.ttf">
+    <Resource Include="res\Barlow\Barlow-Light.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-LightItalic.ttf">
+    <Resource Include="res\Barlow\Barlow-LightItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-Medium.ttf">
+    <Resource Include="res\Barlow\Barlow-Medium.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-MediumItalic.ttf">
+    <Resource Include="res\Barlow\Barlow-MediumItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-Regular.ttf">
+    <Resource Include="res\Barlow\Barlow-Regular.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-SemiBold.ttf">
+    <Resource Include="res\Barlow\Barlow-SemiBold.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-SemiBoldItalic.ttf">
+    <Resource Include="res\Barlow\Barlow-SemiBoldItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-Thin.ttf">
+    <Resource Include="res\Barlow\Barlow-Thin.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="res\Barlow-ThinItalic.ttf">
+    <Resource Include="res\Barlow\Barlow-ThinItalic.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <None Include="trained_network.nn">
+    <None Include="res\trained_network.nn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -258,10 +258,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="blank-sudoku-grid.png" />
+    <Resource Include="res\blank-sudoku-grid.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="res\OFL.txt">
+    <Resource Include="res\Barlow\OFL.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

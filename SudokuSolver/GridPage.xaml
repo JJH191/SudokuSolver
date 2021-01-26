@@ -9,7 +9,7 @@
       Title="GridPage" Width="{Binding Size, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SudokuGrid}}}">
 
     <StackPanel>
-        <local:SudokuGrid x:Name="SudokuGrid" Enabled="True" DataGrid="{Binding}" Size="550"/>
+        <local:SudokuGrid x:Name="SudokuGrid" Size="550" Enabled="True" DataGrid="{Binding}"/>
         <TextBlock Foreground="#CC000000" FontSize="14" Margin="0,5,0,0">Adjust any numbers that are wrong, then press solve (or check if you filled the grid in)</TextBlock>
         <TextBlock Foreground="#CC000000" FontSize="14">After you check your solution, you can save it to view it in the review section another time</TextBlock>
         <Grid Margin="0,20,0,0">

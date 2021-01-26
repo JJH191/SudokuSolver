@@ -18,7 +18,7 @@ namespace SudokuSolver
             float cellSize = grid.Width / 9f; // Get the size of an individual cell
 
             int[,] sudoku = new int[9, 9];
-            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("trained_network.nn"); // Create the classifier from the saved model
+            NeuralNetworkDigitClassifier classifier = new NeuralNetworkDigitClassifier("res/trained_network.nn"); // Create the classifier from the saved model
 
             for (int j = 0; j < 9; j++)
             {

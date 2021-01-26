@@ -53,7 +53,7 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <VirtualizingStackPanel Orientation="Horizontal">
-                        <local:SudokuGrid Enabled="False" DataGrid="{Binding SudokuGrid}" Size="200" />
+                        <local:SudokuGrid Enabled="False" DataGrid="{Binding SudokuGrid}" Size="200"/>
                         <VirtualizingStackPanel VerticalAlignment="Center">
                             <TextBlock Margin="10,0" FontSize="20"  Text="{Binding Date, Mode=OneWay, StringFormat=\{0:D\}}"/>
                             <TextBlock Margin="10,0" FontSize="20" Text="{Binding SolvedSuccessfully, Converter={StaticResource SuccessfulToStringConverter}, Mode=OneWay}"/>

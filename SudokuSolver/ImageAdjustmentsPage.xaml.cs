@@ -164,7 +164,7 @@ namespace SudokuSolver
 
             if (adjustedImage == null) // Could not get the adjusted image as the corners were invalid
             {
-                MessageBox.Show("Corners should form a square like shape. Make sure that the corners are with the image and try again", "Error - Invalid Corners");
+                MessageBox.Show("The corners form an invalid shape. Please ensure they match the image", "Error - Invalid Corners", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 

@@ -105,7 +105,6 @@ namespace DigitClassifier
             return Map(matrix, (value) => value * val); // Loop through all the values in matrix and multiply them by val
         }
 
-        // TODO (ESSENTIAL): Not my code
         public static Matrix operator *(Matrix matrix1, Matrix matrix2)
         {
             if (matrix1.data[0].Length != matrix2.data.Length) throw new ArgumentException("Shape error - left matrix columns should equal right matrix rows");
@@ -148,7 +147,6 @@ namespace DigitClassifier
         /// Transposing will swap the rows and columns of the matrix
         /// </summary>
         /// <returns>This matrix after being transposed</returns>
-        // TODO (ESSENTIAL): Not my code
         public Matrix GetTransposed()
         {
             Matrix transposed = new Matrix(data[0].Length, data.Length); // Create a new matrix with the rows and columns flipped

@@ -32,7 +32,7 @@ namespace SudokuSolver
             {
                 if (!sudokuGrid.Solve())
                 {
-                    MessageBox.Show("Could not solve the sudoku.\nThis is most likely because one or more numbers are incorrect.", "Error solving");
+                    MessageBox.Show("Could not solve the sudoku. Check that the numbers are correct", "Error solving", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             else // Check or save
@@ -45,7 +45,7 @@ namespace SudokuSolver
                 else // Save
                 {
                     SqliteDataAccess.Save(sudokuGrid.GetModel(), SaveCopyOfImage(imagePath));
-                    MessageBox.Show("Sudoku saved!", "Saved");
+                    MessageBox.Show("Sudoku saved!", "Saved", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     // Go back to main menu
                     NavigationService.GoBack();

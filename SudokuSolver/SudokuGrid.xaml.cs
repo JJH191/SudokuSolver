@@ -168,11 +168,6 @@ namespace SudokuSolver
             // Text size
             text.SetBinding(FontSizeProperty, new Binding("TextFontSize") { Source = this, Mode = BindingMode.OneWay });
 
-            // Enable/disable editing of grid without greying out
-            Binding enabledBinding = new Binding("Enabled") { Source = this };
-            text.SetBinding(IsHitTestVisibleProperty, enabledBinding);
-            text.SetBinding(FocusableProperty, enabledBinding);
-
             SetGridPosition(grid, i, j); // Set position in sudoku grid
             grid.Children.Add(text);
 
