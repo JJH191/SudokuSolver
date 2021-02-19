@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="Sudoku Solver" Height="450" Width="700" ResizeMode="CanMinimize" SizeToContent="WidthAndHeight">
     <Grid Margin="25">
+        <!-- Provides a window and frame to contain the current page with a border of 25 -->
         <Frame x:Name="FrmContent" NavigationUIVisibility="Hidden"/>
     </Grid>
 </Window>

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Globalization;
-using System.Windows;
+using System.IO;
 using System.Windows.Data;
-using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 namespace ViewModels.Converters
@@ -19,14 +18,19 @@ namespace ViewModels.Converters
             Bitmap bitmap = (Bitmap)value;
             if (bitmap == null) return null;
 
-            // Code from https://stackoverflow.com/questions/94456/load-a-wpf-bitmapimage-from-a-system-drawing-bitmap/6775114
-            BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(
-                bitmap.GetHbitmap(),
-                IntPtr.Zero, Int32Rect.Empty,
-                BitmapSizeOptions.FromWidthAndHeight(bitmap.Width, bitmap.Height)
-            );
+            // Code from https://stackoverflow.com/questions/22499407/how-to-display-a-bitmap-in-a-wpf-image
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
 
-            return bitmapSource;
+                return bitmapimage;
+            }
         }
 
         // Should not need to convert back

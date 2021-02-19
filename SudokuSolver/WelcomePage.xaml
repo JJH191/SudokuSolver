@@ -7,8 +7,13 @@
       mc:Ignorable="d" 
       Title="WelcomePage">
     <StackPanel>
+        <!-- Title -->
         <TextBlock FontSize="40" TextAlignment="Center" Width="300">Sudoku Solver</TextBlock>
+        
+        <!-- Information for user -->
         <TextBlock FontSize="14" TextAlignment="Center" Width="300" Margin="0,5,0,0" Foreground="#C2000000" TextWrapping="Wrap">Please make sure your images have a plain background to get the best results</TextBlock>
+        
+        <!-- Navigation buttons -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
             <Button Width="100" Margin="5,0,5,0" Click="BtnSolve_Click">Solve or Check</Button>
             <Button Width="100" Margin="5,0,5,0" Click="BtnReview_Click">Review</Button>

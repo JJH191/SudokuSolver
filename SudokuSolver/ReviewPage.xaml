@@ -11,6 +11,7 @@
       Width="700" Height="800"
       Title="ReviewPage">
     <Page.Resources>
+        <!-- Load the binding converters -->
         <converters:BitmapToBitmapImage x:Key="BitmapToBitmapImage"/>
         <converters:SuccessfulToStringConverter x:Key="SuccessfulToStringConverter"/>
     </Page.Resources>
@@ -18,24 +19,35 @@
     <StackPanel>
         <TextBlock FontSize="30" HorizontalAlignment="Center" Width="300" TextAlignment="Center">Review</TextBlock>
         <Grid Margin="10,0,0,0">
+            <!-- Panel of info/drop down at the top -->
             <Grid.ColumnDefinitions>
+                <!-- Success rate -->
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                
+                <!-- Spacer -->
                 <ColumnDefinition Width="*"/>
+                
+                <!-- Sort drop down -->
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+            <!-- Success rate -->
             <TextBlock Grid.Column="0" Text="Success rate: "/>
-            <TextBlock Grid.Column="1" Text="{Binding SuccessRate, StringFormat=N2}"/>
+            <TextBlock Grid.Column="1" Text="{Binding SuccessRate, StringFormat=N0}"/>
             <TextBlock Grid.Column="2" Text="%"/>
 
+            <!-- Sorting drop down -->
             <TextBlock Grid.Column="4" Text="Sort by:" VerticalAlignment="Center"/>
             <ComboBox Grid.Column="5" Width="100" Margin="10,0" SelectedIndex="{Binding SelectedIndex, FallbackValue=0, Mode=OneWayToSource}">
                 <ComboBoxItem>Newest first</ComboBoxItem>
                 <ComboBoxItem>Oldest first</ComboBoxItem>
             </ComboBox>
         </Grid>
+
+        <!-- List of all the previous solved sudokus -->
+        <!-- Virtualizing enables lazy loading of the images for speed with larger lists -->
         <ListBox x:Name="LstReviewList" ItemsSource="{Binding Entries}"
                  BorderBrush="Transparent" 
                  Margin="0,10,0,0" 
@@ -53,7 +65,10 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <VirtualizingStackPanel Orientation="Horizontal">
+                        <!-- Mini sudoku icon of the specific soduku -->
                         <local:SudokuGrid Enabled="False" DataGrid="{Binding SudokuGrid}" Size="200"/>
+                        
+                        <!-- Extra info about the solve -->
                         <VirtualizingStackPanel VerticalAlignment="Center">
                             <TextBlock Margin="10,0" FontSize="20"  Text="{Binding Date, Mode=OneWay, StringFormat=\{0:D\}}"/>
                             <TextBlock Margin="10,0" FontSize="20" Text="{Binding SolvedSuccessfully, Converter={StaticResource SuccessfulToStringConverter}, Mode=OneWay}"/>
@@ -62,6 +77,8 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        
+        <!-- Back button -->
         <Button HorizontalAlignment="Left" Margin="10,20,0,0" Width="100" Click="BtnBack_Click">Back</Button>
     </StackPanel>
 </Page>

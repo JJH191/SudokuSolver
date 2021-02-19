@@ -5,8 +5,7 @@ using System.Windows.Data;
 namespace ViewModels.Converters
 {
     /// <summary>
-    /// Converts a given bitmap to a bitmapImage
-    /// Used to display a bitmap in a control through WPF
+    /// Converts a given integer to a string to be put in the cell
     /// </summary>
     public class IntToCellString : IValueConverter
     {

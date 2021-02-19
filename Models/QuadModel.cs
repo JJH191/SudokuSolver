@@ -72,6 +72,11 @@ namespace Models
             return clockwiseHull.ToArray();
         }
 
+        /// <summary>
+        /// Works out if the given hull is a valid quad
+        /// </summary>
+        /// <param name="hull">The hull to check</param>
+        /// <returns>True if the hull is a valid quad, false if not</returns>
         private bool IsHullValid(Vector2D[] hull)
         {
             // If the number of points is 3, one point is inside the triangle formed by the other 3
@@ -114,7 +119,8 @@ namespace Models
             // Loop through all points to find the one with the shortest distance to (0, 0)
             foreach (Vector2D p in corners)
             {
-                // Using length squared as it is quicker to calculate than length (does not require square root)
+                // Using length squared as it is quicker to calculate than length (as it does not require square root)
+                // This works because we are only comparing if one is larger than the other
                 double lengthSquared = p.LengthSquared();
                 if (lengthSquared < shortestDistSquared)
                 {
@@ -142,7 +148,13 @@ namespace Models
             return topLeft;
         }
 
-        private bool PointInTriangle(Vector2D point, List<Vector2D> trianglePoints)
+        /// <summary>
+        /// Checks if a given point is inside a triangle
+        /// </summary>
+        /// <param name="point">The point to check</param>
+        /// <param name="trianglePoints">The triangle to check if a point is inside</param>
+        /// <returns>True if the point is inside the triangle</returns>
+        private bool PointInTriangle(Vector2D point, List<Vector2D> trianglePoints) // A convenience method to call the PointInTriange(p, p, p, p)
         {
             if (trianglePoints.Count != 3) throw new ArgumentException("trianglePoints should contain 3 points");
             return PointInTriangle(point, trianglePoints[0], trianglePoints[1], trianglePoints[2]);

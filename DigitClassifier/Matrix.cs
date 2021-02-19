@@ -43,7 +43,7 @@ namespace DigitClassifier
             data = new double[vector.Length][];
 
             for (int i = 0; i < vector.Length; i++)
-                data[i] = new double[] { vector[i] }; // Create an array with one element in it (from the vector)
+                data[i] = new double[] { vector[i] }; // Create an array with one item in it (from the vector)
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace DigitClassifier
         #region Mathematical operations
         /// <summary>
         /// Adds <paramref name="matrix1"/> and <paramref name="matrix2"/> together
-        /// Each element in <paramref name="matrix1"/> is added to the corresponding value in <paramref name="matrix2"/>
+        /// Each item in <paramref name="matrix1"/> is added to the corresponding value in <paramref name="matrix2"/>
         /// </summary>
         /// <param name="matrix1">First matrix</param>
         /// <param name="matrix2">Second matrix</param>
@@ -82,11 +82,11 @@ namespace DigitClassifier
 
         /// <summary>
         /// Subtract <paramref name="matrix2"/> from <paramref name="matrix1"/>
-        /// Each element in <paramref name="matrix2"/> is subtracted from the corresponding value in <paramref name="matrix1"/>
+        /// Each item in <paramref name="matrix2"/> is subtracted from the corresponding value in <paramref name="matrix1"/>
         /// </summary>
         /// <param name="matrix1">The matrix to subtract from</param>
         /// <param name="matrix2">The matrix that is subtracted</param>
-        /// <returns>A new matrix where each element in <paramref name="matrix2"/> is subtracted from <paramref name="matrix1"/></returns>
+        /// <returns>A new matrix where each item in <paramref name="matrix2"/> is subtracted from <paramref name="matrix1"/></returns>
         public static Matrix operator -(Matrix matrix1, Matrix matrix2)
         {
             if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new ArgumentException("Shape error - matrices do not have the same shape");
@@ -95,16 +95,23 @@ namespace DigitClassifier
 
         /// <summary>
         /// Scalar multiplication between <paramref name="matrix"/> and <paramref name="val"/>
-        /// Each element in the <paramref name="matrix"/> is multiplied by <paramref name="val"/>
+        /// Each item in the <paramref name="matrix"/> is multiplied by <paramref name="val"/>
         /// </summary>
         /// <param name="matrix">The matrix to multiply</param>
-        /// <param name="val">The value to multiply each element by</param>
-        /// <returns>A new matrix with all the elements multiplied by <paramref name="val"/></returns>
+        /// <param name="val">The value to multiply each item by</param>
+        /// <returns>A new matrix with all the items multiplied by <paramref name="val"/></returns>
         public static Matrix operator *(Matrix matrix, double val)
         {
             return Map(matrix, (value) => value * val); // Loop through all the values in matrix and multiply them by val
         }
 
+        /// <summary>
+        /// Matrix multiplication of <paramref name="matrix1"/> and <paramref name="matrix2"/>
+        /// The items in the rows of <paramref name="matrix1"/> are multiplied by the items in the columns of <paramref name="matrix2"/> and then it is summed up for each value in the resulting matrix
+        /// </summary>
+        /// <param name="matrix1">First matrix</param>
+        /// <param name="matrix2">Second matrix</param>
+        /// <returns>A new matrix that is the matrix multiplication of <paramref name="matrix1"/> and <paramref name="matrix2"/></returns>
         public static Matrix operator *(Matrix matrix1, Matrix matrix2)
         {
             if (matrix1.data[0].Length != matrix2.data.Length) throw new ArgumentException("Shape error - left matrix columns should equal right matrix rows");
@@ -118,7 +125,7 @@ namespace DigitClassifier
                 {
                     double sum = 0;
 
-                    // Multiply each row element in matrix1 by the corresponding element in the column of matrix2 and add it all up
+                    // Multiply each row item in matrix1 by the corresponding item in the column of matrix2 and add it all up
                     for (int k = 0; k < matrix1.data[0].Length; k++)
                         sum += matrix1.data[i][k] * matrix2.data[k][j];
 
@@ -130,11 +137,11 @@ namespace DigitClassifier
         }
 
         /// <summary>
-        /// Multiplies all the elements in <paramref name="matrix1"/> by the corresponding value in <paramref name="matrix2"/>
+        /// Multiplies all the items in <paramref name="matrix1"/> by the corresponding value in <paramref name="matrix2"/>
         /// </summary>
         /// <param name="matrix1">First matrix</param>
         /// <param name="matrix2">Second matrix</param>
-        /// <returns>A new matrix where each element is the product of the elements from <paramref name="matrix1"/> and <paramref name="matrix2"/></returns>
+        /// <returns>A new matrix where each item is the product of the items from <paramref name="matrix1"/> and <paramref name="matrix2"/></returns>
         public static Matrix ScalarProduct(Matrix matrix1, Matrix matrix2)
         {
             if (matrix1.data.Length != matrix2.data.Length || matrix1.data[0].Length != matrix2.data[0].Length) throw new ArgumentException("Shape error - matrices do not have the same shape");
@@ -168,31 +175,31 @@ namespace DigitClassifier
 
         #region Map
         /// <summary>
-        /// Applies the function <paramref name="func"/> to each element in the matrix
+        /// Applies the function <paramref name="func"/> to each item in the matrix
         /// </summary>
-        /// <param name="func">The function to apply to each element - taking in the current value and returning the new one</param>
+        /// <param name="func">The function to apply to each item - taking in the current value and returning the new one</param>
         public void Map(Func<double, double> func)
         {
             for (int i = 0; i < data.Length; i++)
             {
                 for (int j = 0; j < data[i].Length; j++)
                 {
-                    data[i][j] = func(data[i][j]); // Apply the function to each element
+                    data[i][j] = func(data[i][j]); // Apply the function to each item
                 }
             }
         }
 
         /// <summary>
-        /// Applies the function <paramref name="func"/> to each element in the matrix
+        /// Applies the function <paramref name="func"/> to each item in the matrix
         /// </summary>
-        /// <param name="func">The function to apply to each element - taking in the current value, and the position of that value, then returning the new value</param>
+        /// <param name="func">The function to apply to each item - taking in the current value, and the position of that value, then returning the new value</param>
         public void Map(Func<double, int, int, double> func)
         {
             for (int i = 0; i < data.Length; i++)
             {
                 for (int j = 0; j < data[i].Length; j++)
                 {
-                    data[i][j] = func(data[i][j], i, j); // Apply the function to each element
+                    data[i][j] = func(data[i][j], i, j); // Apply the function to each item
                 }
             }
         }
@@ -200,11 +207,11 @@ namespace DigitClassifier
         // Static mapping
 
         /// <summary>
-        /// Applies the function <paramref name="func"/> to each element in the matrix
+        /// Applies the function <paramref name="func"/> to each item in the matrix
         /// </summary>
         /// <param name="matrix">The matrix to apply <paramref name="func"/> to</param>
-        /// <param name="func">The function to apply to each element - taking in the current value and returning the new one</param>
-        /// <returns>A new matrix filled with the results of applying <paramref name="func"/> to the elements in <paramref name="matrix"/></returns>
+        /// <param name="func">The function to apply to each item - taking in the current value and returning the new one</param>
+        /// <returns>A new matrix filled with the results of applying <paramref name="func"/> to the items in <paramref name="matrix"/></returns>
         public static Matrix Map(Matrix matrix, Func<double, double> func)
         {
             Matrix result = new Matrix(matrix.data.Length, matrix.data[0].Length);
@@ -212,7 +219,7 @@ namespace DigitClassifier
             {
                 for (int j = 0; j < result.data[i].Length; j++)
                 {
-                    result.data[i][j] = func(matrix.data[i][j]); // Apply the function to each element
+                    result.data[i][j] = func(matrix.data[i][j]); // Apply the function to each item
                 }
             }
 
@@ -220,11 +227,11 @@ namespace DigitClassifier
         }
 
         /// <summary>
-        /// Applies the function <paramref name="func"/> to each element in the matrix
+        /// Applies the function <paramref name="func"/> to each item in the matrix
         /// </summary>
         /// <param name="matrix">The matrix to apply <paramref name="func"/> to</param>
-        /// <param name="func">The function to apply to each element - taking in the current value, and the position of that value, then returning the new value</param>
-        /// <returns>A new matrix filled with the results of applying <paramref name="func"/> to the elements in <paramref name="matrix"/></returns>
+        /// <param name="func">The function to apply to each item - taking in the current value, and the position of that value, then returning the new value</param>
+        /// <returns>A new matrix filled with the results of applying <paramref name="func"/> to the items in <paramref name="matrix"/></returns>
         public static Matrix Map(Matrix matrix, Func<double, int, int, double> func)
         {
             Matrix result = new Matrix(matrix.data.Length, matrix.data[0].Length);
@@ -232,7 +239,7 @@ namespace DigitClassifier
             {
                 for (int j = 0; j < result.data[i].Length; j++)
                 {
-                    result.data[i][j] = func(matrix.data[i][j], i, j); // Apply the function to each element
+                    result.data[i][j] = func(matrix.data[i][j], i, j); // Apply the function to each item
                 }
             }
 
@@ -250,7 +257,7 @@ namespace DigitClassifier
             bw.Write(data.Length); // Write the number of rows
             bw.Write(data[0].Length); // Then the number of columns
 
-            // Then write each element of data
+            // Then write each item of data
             for (int i = 0; i < data.Length; i++)
             {
                 for (int j = 0; j < data[0].Length; j++)
@@ -267,7 +274,7 @@ namespace DigitClassifier
         /// <returns>A new matrix with the data from the binary reader</returns>
         public static Matrix Deserialise(BinaryReader br)
         {
-            // Read in the number of rows and columns
+            // Read in the number of rows and columns6
             int rows = br.ReadInt32();
             int cols = br.ReadInt32();
 
@@ -286,9 +293,15 @@ namespace DigitClassifier
         }
         #endregion
 
+        /// <summary>
+        /// Converts this matrix to an array
+        /// NOTE: The matrix must have only 1 column
+        /// </summary>
+        /// <returns>The array version of this matrix</returns>
         public double[] ToArray()
         {
             // TODO (CHECK): Check my code works (myArray) as it should (test)
+            // TODO (EXTRA FEATURE): Make sure the matrix has dimensions Nx1
             var test = data.SelectMany(x => x.Select(y => y)).ToArray();
             double[] myArray = new double[data.Length];
             for (int i = 0; i < myArray.Length; i++)
@@ -300,6 +313,7 @@ namespace DigitClassifier
             return myArray;
         }
 
+        // TODO (CLEANING): Remove this once done with checking
         private bool AreEqual(double[] arr1, double[] arr2)
         {
             if (arr1.Length != arr2.Length) return false;

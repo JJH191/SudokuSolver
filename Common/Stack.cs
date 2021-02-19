@@ -12,7 +12,7 @@ namespace Common
     public class Stack<T>
     {
         private T[] data; // Holds the data in the stack
-        public int Count { get; private set; } // Keeps track of the number of elements
+        public int Count { get; private set; } // Keeps track of the number of items
 
         /// <summary>
         /// Create a stack starting with a size of <paramref name="initialSize"/>
@@ -42,23 +42,23 @@ namespace Common
         }
 
         /// <summary>
-        /// Returns the last element in the stack and then removes it
+        /// Returns the last item in the stack and then removes it
         /// </summary>
-        /// <returns>The last element in the stack</returns>
+        /// <returns>The last item in the stack</returns>
         public T Pop()
         {
             if (Count == 0) throw new IndexOutOfRangeException("Could not pop, the stack is empty"); // Throw an error if user tries to pop an empty stack
-            return data[--Count]; // Return the last element and decrement Count so the item is essential erased (it will be overritten on the next push)
+            return data[--Count]; // Return the last item and decrement Count so the item is essential erased (it will be overritten on the next push)
         }
 
         /// <summary>
-        /// Returns the last element in the stack without removing it
+        /// Returns the last item in the stack without removing it
         /// </summary>
-        /// <returns>The last element in the stack</returns>
+        /// <returns>The last item in the stack</returns>
         public T Peek()
         {
             if (Count == 0) throw new IndexOutOfRangeException("Could not peek, the stack is empty"); // Throw an error if user tries to peek an empty stack
-            return data[Count - 1]; // Return the last element
+            return data[Count - 1]; // Return the last item
         }
 
         /// <summary>

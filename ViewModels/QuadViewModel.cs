@@ -45,7 +45,6 @@ namespace ViewModels
         /// <summary>
         /// Get the quad model to access QuadModel methods
         /// </summary>
-        /// <returns></returns>
         public QuadModel GetModel() => quad;
 
         // Notifier for when a property changes

@@ -12,7 +12,7 @@ namespace ViewModels
     {
         private readonly SudokuImageModel sudokuImage = new SudokuImageModel();
 
-        // Public property to access the image
+        // Public property to access the image of the sudoku
         public Bitmap Image
         {
             get => sudokuImage.Image;

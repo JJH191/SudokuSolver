@@ -7,6 +7,7 @@ namespace Common
     /// </summary>
     public class ProgressBar
     {
+        #region Variables and Constants
         // Characters to build the progress bar from
         private static readonly char fillChar = '█';
         private static readonly char emptyChar = ' ';
@@ -22,6 +23,7 @@ namespace Common
 
         // Keeps track of whether it is the first print so that the cursor is only reset on subsequent calls of PrintProgress
         private bool isFirstPrint = true;
+        #endregion
 
         /// <summary>
         /// Create a new progress bar

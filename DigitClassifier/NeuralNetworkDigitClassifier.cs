@@ -38,7 +38,8 @@ namespace DigitClassifier
                 {
                     Color pixel = scaledImage.GetPixel(i, j); // Get the colour at each pixel
 
-                    pixels[j * scaledImage.Width + i] = Utils.MapRange(pixel.GetBrightness(), 0, 1, 0.01, 1); // Get the brightness, map it so its between 0.01 and 1 (to prevents zeros propagating through the network), then add it to the pixels array
+                    // Get the brightness, map it so its between 0.01 and 1 (to prevents zeros propagating through the network), then add it to the pixels array
+                    pixels[j * scaledImage.Width + i] = MathsUtils.MapRange(pixel.GetBrightness(), 0, 1, 0.01, 1);
                 }
             }
 

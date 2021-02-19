@@ -76,7 +76,7 @@ namespace Common
                     for (int i = x - 1; i <= x + 1; i++)
                         for (int j = y - 1; j <= y + 1; j++)
                             pixelsToFill.Push(new Vector2D(i, j));
-                    // NOTE: Does not matter that I'm adding the current pixel to the stack as it will already be filled to the new colour so the flood fill will not do anything
+                    // NOTE: Does not matter that I'm adding the current pixel to the stack as it has already been filled, so will be ignored
                 }
             }
 
@@ -124,6 +124,11 @@ namespace Common
         // Code from https://stackoverflow.com/questions/33024881/invert-image-faster-in-c-sharp
         // I cleaned this up a bit to make it more readable, including renaming variables.
         // For example, the for loops go to less than width/height, whereas the original went to less than or equal to the width/height - 1
+        /// <summary>
+        /// Inverts the bitmap - every pixel value becomes 255 - value
+        /// </summary>
+        /// <param name="image">The image to invert</param>
+        /// <returns>The inverted image</returns>
         public static Bitmap Invert(this Bitmap image)
         {
             Bitmap result = new Bitmap(image);

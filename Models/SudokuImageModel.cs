@@ -3,7 +3,6 @@ using Accord.Imaging.Filters;
 using Common;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Linq;
 
 namespace Models
@@ -34,26 +33,17 @@ namespace Models
         // Threshold of the greyscale - the cutoff brightness for what is considered black and what is considered white
         public double Threshold { get; set; }
 
+        /// <summary>
+        /// Makes the image greyscale with the given threshold value
+        /// </summary>
         public void Greyscale()
         {
-            // Code from https://stackoverflow.com/questions/2746103/what-would-be-a-good-true-black-and-white-colormatrix
-            using (Graphics gr = Graphics.FromImage(current))
+            current.Dispose();
+            BradleyLocalThresholding filter = new BradleyLocalThresholding
             {
-                var gray_matrix = new float[][] {
-                    new float[] { 0.299f, 0.299f, 0.299f, 0, 0 },
-                    new float[] { 0.587f, 0.587f, 0.587f, 0, 0 },
-                    new float[] { 0.114f, 0.114f, 0.114f, 0, 0 },
-                    new float[] { 0,      0,      0,      1, 0 },
-                    new float[] { 0,      0,      0,      0, 1 }
-                };
-
-                var ia = new ImageAttributes();
-                ia.SetColorMatrix(new ColorMatrix(gray_matrix));
-                ia.SetThreshold((float)Threshold); // Change this threshold as needed
-
-                var rc = new Rectangle(0, 0, original.Width, original.Height);
-                gr.DrawImage(original, rc, 0, 0, original.Width, original.Height, GraphicsUnit.Pixel, ia);
-            }
+                PixelBrightnessDifferenceLimit = (float)Threshold * 0.45f // 0.45 gave the best starting point from testing
+            };
+            current = filter.Apply(Grayscale.CommonAlgorithms.BT709.Apply(original));
         }
 
         /// <summary>

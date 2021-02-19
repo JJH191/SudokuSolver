@@ -23,24 +23,28 @@ namespace SudokuSolver
 
         private readonly string sudokuPath;
         private readonly double circleRadius = 7.5f;
-        private int selected = -1;
+        private int selected = -1; // Keeps track of the current corner being dragged
 
         private readonly GridClassificationHelper gridClassificationHelper;
 
         public ImageAdjustmentsPage(string sudokuPath)
         {
             InitializeComponent();
+            Focus(); // Focus this page so that it receives the KeyDown event
+
             gridClassificationHelper = new GridClassificationHelper();
             viewModel = (SudokuImageViewModel)DataContext;
 
-            this.sudokuPath = sudokuPath;
+            this.sudokuPath = sudokuPath; // Stores the image path in case the user wants to save the sudoku
             viewModel.Image = new Bitmap(sudokuPath);
-            viewModel.Threshold = 0.6;
+            viewModel.Threshold = 0.5;
 
+            // Guess the corners and set up the quad model
             Vector2D[] detectedCorners = gridClassificationHelper.DetectCorners(viewModel.Image);
             quadViewModel = new QuadViewModel(detectedCorners);
 
-            // Adds corners clockwise
+            // Add ellipses at the corners of the quad onto the canvas (clockwise)
+            // TODO (CHECK): Does this work with a simple for loop?
             Ellipse[] corners = new Ellipse[4];
             for (int j = 0; j < 2; j++)
             {
@@ -66,15 +70,15 @@ namespace SudokuSolver
         }
 
         /// <summary>
-        /// Create the quad that is rendered on the CvsImage
+        /// Create the quad that is rendered on the canvas
         /// </summary>
         private void CreateQuad()
         {
+            // Set all the bindings for each coordinate of each edge of the quad
             for (int i = 0; i < quadViewModel.Length; i++)
             {
                 Line line = new Line { Stroke = new SolidColorBrush(Colors.Fuchsia) };
 
-                // Set all the bindings for each coordinate to the quad's corner positiopns
                 line.SetBinding(Line.X1Property, new Binding($"[{i}].X") { Source = quadViewModel, Mode = BindingMode.OneWay });
                 line.SetBinding(Line.Y1Property, new Binding($"[{i}].Y") { Source = quadViewModel, Mode = BindingMode.OneWay });
                 line.SetBinding(Line.X2Property, new Binding($"[{(i + 1) % quadViewModel.Length}].X") { Source = quadViewModel, Mode = BindingMode.OneWay });
@@ -85,6 +89,27 @@ namespace SudokuSolver
         }
 
         /// <summary>
+        /// Navigate to the next page and pass the sudoku grid and image path
+        /// </summary>
+        private void NavigateToGridPage()
+        {
+            Bitmap adjustedImage = viewModel.GetAdjustedImage(quadViewModel); // Get the grid cropped and with fixed perspective
+
+            if (adjustedImage == null) // Could not get the adjusted image as the corners were invalid
+            {
+                MessageBox.Show("The corners form an invalid shape. Please ensure they match the image", "Error - Invalid Corners", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Get all the classified digits for each cell
+            int[,] sudoku = gridClassificationHelper.ClassifyGrid(adjustedImage);
+
+            // Navigate to next page with the sudoku grid
+            NavigationService.Navigate(new GridPage(sudoku, sudokuPath));
+        }
+
+        #region Events
+        /// <summary>
         /// Update the greyscale based on the new threshold
         /// </summary>
         private void SldThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -92,6 +117,9 @@ namespace SudokuSolver
             viewModel.Greyscale();
         }
 
+        /// <summary>
+        /// Uses the corner detection to estimate where the corners are
+        /// </summary>
         private void BtnEstimateCorners_Click(object sender, RoutedEventArgs e)
         {
             Vector2D[] corners = gridClassificationHelper.DetectCorners(viewModel.Image);
@@ -108,6 +136,7 @@ namespace SudokuSolver
             if (selected == -1) return;
             System.Windows.Point mousePos = e.GetPosition(CvsImage);
 
+            // Set the corner to be the position of the mouse (clamped to the canvas bounds)
             quadViewModel[selected] = new Vector2D(
                 Math.Max(Math.Min(mousePos.X, CvsImage.Width), 0),
                 Math.Max(Math.Min(mousePos.Y, CvsImage.Height), 0)
@@ -156,22 +185,21 @@ namespace SudokuSolver
 
 
         /// <summary>
-        /// Go to the next page and pass the adjusted image
+        /// Go to the grid page if the next button is clicked
         /// </summary>
         private void BtnNext_Click(object sender, RoutedEventArgs e)
         {
-            Bitmap adjustedImage = viewModel.GetAdjustedImage(quadViewModel); // Get the grid cropped and with fixed perspective
-
-            if (adjustedImage == null) // Could not get the adjusted image as the corners were invalid
-            {
-                MessageBox.Show("The corners form an invalid shape. Please ensure they match the image", "Error - Invalid Corners", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            int[,] sudoku = gridClassificationHelper.ClassifyGrid(adjustedImage);
-
-            // Navigate to next page with the sudoku grid
-            NavigationService.Navigate(new GridPage(sudoku, sudokuPath));
+            NavigateToGridPage();
         }
+
+        /// <summary>
+        /// Go to the grid page if enter is pressed
+        /// </summary>
+        private void Page_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return) NavigateToGridPage();
+        }
+
+        #endregion
     }
 }

@@ -10,7 +10,7 @@
 
         public InputData(double[] inputs, int target)
         {
-            // Create a new target array with 10 elements
+            // Create a new target array with 10 items
             targets = new double[10];
 
             // Set all the values in the targets array to 0.01

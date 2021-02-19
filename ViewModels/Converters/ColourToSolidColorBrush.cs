@@ -7,8 +7,7 @@ using System.Windows.Media;
 namespace ViewModels.Converters
 {
     /// <summary>
-    /// Converts a given bitmap to a bitmapImage
-    /// Used to display a bitmap in a control through WPF
+    /// Converts a given colour to a SolidColourBrush to be used for colouring UI
     /// </summary>
     public class ColourToSolidColourBrush : IValueConverter
     {

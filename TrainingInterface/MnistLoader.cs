@@ -46,7 +46,7 @@ namespace TrainingInterface
                 int dimensions = numRows * numCols;
                 for (int i = 0; i < numImages; i++)
                 {
-                    double[] inputs = brImages.ReadBytes(dimensions).Select(x => Utils.MapRange(x, 0, 255, 0.01, 1)).ToArray();
+                    double[] inputs = brImages.ReadBytes(dimensions).Select(x => MathsUtils.MapRange(x, 0, 255, 0.01, 1)).ToArray();
                     int target = brLabels.ReadByte();
 
                     inputData[i] = new InputData(inputs, target);

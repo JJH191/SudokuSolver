@@ -54,7 +54,7 @@ namespace Common
         }
         #endregion
 
-        #region Implicit Conversions
+        #region Conversions
         // Implicit conversion from Point to Vector
         public static implicit operator Vector2I(System.Drawing.Point p) => new Vector2I(p);
         public static implicit operator Vector2I(System.Windows.Point p) => new Vector2I(p);

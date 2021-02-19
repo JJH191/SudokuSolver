@@ -2,6 +2,9 @@
 
 namespace Common
 {
+    /// <summary>
+    /// A set of utility functions for lists
+    /// </summary>
     public static class ListUtils
     {
         private static readonly Random rng = new Random();

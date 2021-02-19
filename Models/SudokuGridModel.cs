@@ -18,8 +18,9 @@ namespace Models
         /// <param name="data">Data to fill the sudoku grid with</param>
         public SudokuGridModel(int[,] data)
         {
-            numberOfFilledCells = 0;
+            numberOfFilledCells = 0; // All cells are empty
 
+            // Loop through the provided data and create cell models from it, adding the cell number modified event to each cell
             Data = new CellModel[9, 9];
             for (int j = 0; j < data.GetLength(1); j++)
             {
@@ -27,7 +28,7 @@ namespace Models
                 {
                     Data[i, j] = new CellModel(data[i, j]);
                     Data[i, j].CellNumberModifiedEvent += CellNumberModifiedEvent;
-                    if (data[i, j] != -1) numberOfFilledCells++;
+                    if (data[i, j] != -1) numberOfFilledCells++; // If the cell isn't empty, add 1 to the number of filled cells
                 }
             }
         }
@@ -35,7 +36,11 @@ namespace Models
         // Keeps track of how many cells contain numbers
         private int numberOfFilledCells;
 
-        // Updates numberOfFilledCells when a cell changes
+        /// <summary>
+        /// Updates numberOfFilledCells when a cell changes
+        /// </summary>
+        /// <param name="oldValue">The old value of the cell</param>
+        /// <param name="newValue">The new value of the cell</param>
         private void CellNumberModifiedEvent(int oldValue, int newValue)
         {
             if (newValue != oldValue) // Make sure there is a change
@@ -145,6 +150,10 @@ namespace Models
             return true;
         }
 
+        /// <summary>
+        /// Checks if the sudoku grid is full
+        /// </summary>
+        /// <returns>True if the grid is full or false if it has at least one empty cell</returns>
         public bool IsFull()
         {
             // If the number of filled cells is the same as the number of cells in the grid, it is full
@@ -205,6 +214,10 @@ namespace Models
             return true;
         }
 
+        /// <summary>
+        /// Gets a list of all the errors made in the sudoku
+        /// </summary>
+        /// <returns>A list of all the location of errors</returns>
         public List<Vector2I> GetErrors()
         {
             List<Vector2I> errors = new List<Vector2I>();
@@ -221,6 +234,12 @@ namespace Models
             return errors;
         }
 
+        /// <summary>
+        /// Checks if a given cell is valid in the sudoku
+        /// </summary>
+        /// <param name="i">The row of the cell</param>
+        /// <param name="j">The column of the cell</param>
+        /// <returns>True if the cell is valid, false if not</returns>
         public bool IsCellValid(int i, int j)
         {
             return IsNumberValid(Data, Data[i, j].Number, i, j);

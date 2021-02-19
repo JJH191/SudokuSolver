@@ -12,6 +12,7 @@
         public int G { get; }
         public int B { get; }
 
+        #region Constructors
         /// <summary>
         /// Create a colour with alpha <paramref name="a"/>, red <paramref name="r"/>, green <paramref name="g"/> and blue <paramref name="b"/>
         /// </summary>
@@ -65,6 +66,15 @@
             G = color.G;
             B = color.B;
         }
+        #endregion
+
+        #region Conversions
+        // Implicit conversion between Colour, System.Windows.Media.Color and System.Drawing.Color
+        public static implicit operator Colour(System.Drawing.Color color) => new Colour(color);
+        public static implicit operator Colour(System.Windows.Media.Color color) => new Colour(color);
+        public static implicit operator System.Drawing.Color(Colour color) => System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
+        public static implicit operator System.Windows.Media.Color(Colour color) => System.Windows.Media.Color.FromArgb((byte)color.A, (byte)color.R, (byte)color.G, (byte)color.B);
+        #endregion
 
         /// <summary>
         /// Gets the brightness of the colour
@@ -74,11 +84,5 @@
         {
             return (0.2126f * R + 0.7152f * G + 0.0722f * B) / 255;
         }
-
-        // Implicit conversion between Colour, System.Windows.Media.Color and System.Drawing.Color
-        public static implicit operator Colour(System.Drawing.Color color) => new Colour(color);
-        public static implicit operator Colour(System.Windows.Media.Color color) => new Colour(color);
-        public static implicit operator System.Drawing.Color(Colour color) => System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
-        public static implicit operator System.Windows.Media.Color(Colour color) => System.Windows.Media.Color.FromArgb((byte)color.A, (byte)color.R, (byte)color.G, (byte)color.B);
     }
 }

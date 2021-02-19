@@ -6,13 +6,18 @@
              xmlns:local="clr-namespace:SudokuSolver"
              mc:Ignorable="d" 
              d:DesignHeight="550" d:DesignWidth="550">
+    <!-- Set the width and height of the grid to the specified size -->
     <Grid 
         Width="{Binding Size, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SudokuGrid}}}"
         Height="{Binding Size, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SudokuGrid}}}">
         <Grid.Background>
+            <!-- Add the background image which shows the lines of the sudoku grid -->
             <ImageBrush ImageSource="{StaticResource BlankSudoku}"/>
         </Grid.Background>
+        
+        <!-- Margin is calculated based off the size to ensure the width of the lines does not affect centring -->
         <Grid x:Name="GrdSudokuGrid" Margin="{Binding MarginSize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SudokuGrid}}}">
+            <!-- 9 evenly spaced rows and columns for all the digits -->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>

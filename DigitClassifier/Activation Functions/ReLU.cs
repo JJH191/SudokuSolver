@@ -2,10 +2,13 @@
 
 namespace DigitClassifier.Activation_Functions
 {
+    /// <summary>
+    /// Implementation of the rectified linear unit activation function
+    /// </summary>
     public class ReLU : IActivationFunction
     {
-        private static ReLU instance;
-        private ReLU() { }
+        private static ReLU instance; // Keep track of singleton instance
+        private ReLU() { } // Make the constructor private
 
         public double Function(double value)
         {
@@ -18,6 +21,7 @@ namespace DigitClassifier.Activation_Functions
             else return 1;
         }
 
+        // Handles creation of the singleton
         public static ReLU GetInstance()
         {
             if (instance == null) instance = new ReLU();

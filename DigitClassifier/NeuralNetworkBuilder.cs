@@ -94,7 +94,7 @@ namespace DigitClassifier
         class LayerInfo
         {
             public readonly int nodes; // The number of nodes in this layer
-            public IActivationFunction activationFunction; // The activation function to apply to each element in this layer
+            public IActivationFunction activationFunction; // The activation function to apply to each input in this layer
 
             /// <summary>
             /// Create a container for the information about a layer - the number of <paramref name="nodes"/> and the <paramref name="activationFunction"/>
